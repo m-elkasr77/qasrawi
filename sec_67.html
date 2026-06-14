@@ -84,6 +84,19 @@ h1{font-size:1.7rem;font-weight:800;text-align:center}
 .rans.no{background:var(--r2);border-color:var(--rd);color:var(--rd)}
 .rans.dim{background:var(--s);border-color:var(--bd);color:var(--mt)}
 </style>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+const _SB=supabase.createClient('https://fnzzdracebdkcvtigris.supabase.co','sb_publishable_BPccEAh0KTTn4YMnNDL_JQ_GMlW3vr1');
+let _startTime=Date.now();
+// جلب بيانات الطالب من localStorage
+const _uid=localStorage.getItem('qk_uid')||'';
+const _uname=localStorage.getItem('qk_name')||'';
+async function _save(sec,subj,correct,total,dur,pct){
+  if(!_uid)return;
+  try{await _SB.from('results').insert([{user_id:_uid,subject:subj,section_num:sec,correct,total,duration_sec:dur,score_pct:pct}]);}
+  catch(e){console.error(e);}
+}
+</script>
 </head>
 <body>
 

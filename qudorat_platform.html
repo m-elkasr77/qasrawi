@@ -206,6 +206,14 @@ tr:hover td{background:var(--s2)}
       <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">📊 اختباراتي</div>
       <div class="tbl" id="stu-tbl"></div>
     </div>
+    <!-- روابط الأقسام -->
+    <div class="card" style="border:1px solid var(--bd);margin-bottom:1rem">
+      <div style="font-size:.9rem;font-weight:700;margin-bottom:.85rem">📚 ابدأ قسماً جديداً</div>
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem" id="sec-links">
+        <div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">جارٍ تحميل الأقسام...</div>
+      </div>
+    </div>
+
     <!-- تسجيل نتيجة -->
     <div class="card" style="border:1px solid var(--p)">
       <div style="font-size:.9rem;font-weight:700;color:var(--pl);margin-bottom:.5rem">📥 تسجيل نتيجة اختبار</div>
@@ -287,13 +295,17 @@ async function doLogin(){
     if(error) throw new Error(error.message);
     if(!data||!data.length){showErr('li-err','اسم المستخدم أو كلمة المرور غير صحيحة');return;}
     me=data[0];
+    // حفظ بيانات الطالب في localStorage للاستخدام في ملفات الأقسام
+    localStorage.setItem('qk_uid', me.id);
+    localStorage.setItem('qk_name', me.name);
+    localStorage.setItem('qk_subj', selSubj||'kamy');
     document.getElementById('li-err').style.display='none';
     if(me.role==='admin') await loadAdmin();
     else await loadStudent();
   }catch(e){showErr('li-err','خطأ: '+e.message);}
   finally{btn.textContent='🔐 دخول';btn.disabled=false;}
 }
-function logout(){me=null;selSubj='';document.getElementById('step1').style.display='block';document.getElementById('step2').style.display='none';document.querySelectorAll('.subj-card').forEach(c=>c.classList.remove('on'));showPg('pg-login');}
+function logout(){me=null;selSubj='';localStorage.removeItem('qk_uid');localStorage.removeItem('qk_name');localStorage.removeItem('qk_subj');document.getElementById('step1').style.display='block';document.getElementById('step2').style.display='none';document.querySelectorAll('.subj-card').forEach(c=>c.classList.remove('on'));showPg('pg-login');}
 
 // ══ ADMIN ══
 async function loadAdmin(){
@@ -430,6 +442,28 @@ async function loadStudent(){
   // فلتر المادة المختارة
   if(selSubj){const sf=document.getElementById('his-filter');if(sf)sf.value=selSubj;}
   await refreshStudent();
+  loadSecLinks();
+}
+async function loadSecLinks(){
+  const subj = selSubj || localStorage.getItem('qk_subj') || 'kamy';
+  try{
+    const {data} = await DB().from('sections').select('section_num').eq('subject', subj).order('section_num',{ascending:true});
+    const secs = data || [];
+    const SUBJ_NAMES = {kamy:'قدرات كمي',gat:'GAT',tahsili:'تحصيلي',saat:'SAAT'};
+    const BASE = 'https://m-elkasr77.github.io/qasrawi/';
+    const container = document.getElementById('sec-links');
+    if(!secs.length){
+      container.innerHTML='<div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">لا يوجد أقسام لهذه المادة</div>';
+      return;
+    }
+    container.innerHTML = secs.map(s=>`
+      <a href="${BASE}sec_${String(s.section_num).padStart(2,'0')}.html" 
+         style="background:var(--s2);border:1.5px solid var(--bd);border-radius:12px;padding:.85rem;text-align:center;text-decoration:none;display:block;transition:.18s"
+         onmouseover="this.style.borderColor='var(--pl)'" onmouseout="this.style.borderColor='var(--bd)'">
+        <div style="font-size:1.1rem;font-weight:800;color:var(--tx)">القسم ${s.section_num}</div>
+        <div style="font-size:.75rem;color:var(--mt);margin-top:.25rem">${SUBJ_NAMES[subj]||subj}</div>
+      </a>`).join('');
+  }catch(e){console.error(e);}
 }
 async function refreshStudent(){
   const {data}=await DB().from('results').select('*').eq('user_id',me.id).order('created_at',{ascending:false});

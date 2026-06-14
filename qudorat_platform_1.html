@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>منصة القصراوي</title>
+<link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@300;400;500;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#0b0b14;--s:#12121e;--s2:#18182a;--s3:#1e1e34;--bd:#252545;--bd2:#30305a;
+  --p:#6c35de;--pl:#9d6bff;--t:#00c4b4;--tl:#00e5d2;
+  --tx:#e8e8f5;--mt:#8888aa;--mt2:#5a5a7a;
+  --gr:#1db86a;--g2:#0a2518;--grd:#22c55e;
+  --rd:#e53535;--r2:#250a0a;
+  --gd:#f0a500;--gdb:#2a1e00;
+  --or:#ff6b35;--or2:#2a1200;
+}
+html,body{background:var(--bg);font-family:'Tajawal',sans-serif;color:var(--tx);min-height:100vh}
+.pg{display:none}.pg.on{display:block}
+@keyframes fu{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.pg.on{animation:fu .28s ease}
+
+/* ── TOPBAR ── */
+.topbar{background:var(--s);border-bottom:1px solid var(--bd);padding:.7rem 1.4rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;backdrop-filter:blur(8px)}
+.topbar-logo{font-size:1.05rem;font-weight:800;background:linear-gradient(135deg,var(--pl),var(--tl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.topbar-right{display:flex;align-items:center;gap:.55rem}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--t));display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;color:#fff;flex-shrink:0}
+.user-chip{display:flex;align-items:center;gap:.4rem;background:var(--s2);border:1px solid var(--bd);border-radius:99px;padding:.28rem .8rem .28rem .4rem;font-size:.83rem;font-weight:600}
+
+/* ── CONTENT ── */
+.content{padding:1.4rem;max-width:960px;margin:auto}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:.6rem 1.3rem;border-radius:10px;font-family:inherit;font-size:.9rem;font-weight:700;cursor:pointer;border:none;transition:transform .12s,opacity .12s}
+.btn:hover{transform:translateY(-1px);opacity:.88}
+.btn:active{transform:none}
+.bp{background:linear-gradient(135deg,var(--p),var(--t));color:#fff}
+.bg2{background:var(--s2);color:var(--mt);border:1px solid var(--bd)}
+.btn-fw{width:100%;margin-top:.9rem;padding:.78rem}
+.btn-sm{padding:.32rem .75rem;font-size:.8rem}
+.btn-danger{background:var(--r2);color:var(--rd);border:1px solid var(--rd)}
+
+/* ── INPUTS ── */
+.inp{width:100%;background:var(--s2);border:1.5px solid var(--bd);border-radius:10px;padding:.68rem 1rem;font-family:inherit;font-size:.93rem;color:var(--tx);outline:none;transition:border-color .15s}
+.inp:focus{border-color:var(--pl)}
+.inp::placeholder{color:var(--mt2)}
+select.inp{cursor:pointer;padding:.65rem .9rem}
+.lbl{font-size:.82rem;font-weight:600;color:var(--mt);display:block;margin-bottom:.38rem}
+.field{margin-bottom:.82rem}
+
+/* ── CARD ── */
+.card{background:var(--s);border:1px solid var(--bd);border-radius:16px;padding:1.3rem 1.4rem;margin-bottom:1rem}
+.card-title{font-size:.97rem;font-weight:700;margin-bottom:.9rem;display:flex;align-items:center;gap:.4rem}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:3px;background:var(--s2);border-radius:12px;padding:4px;margin-bottom:1.3rem;overflow-x:auto}
+.tab{flex:1;min-width:80px;padding:.46rem .4rem;text-align:center;border-radius:9px;font-size:.84rem;font-weight:600;cursor:pointer;color:var(--mt);transition:.15s;white-space:nowrap}
+.tab.on{background:var(--s);color:var(--tx);box-shadow:0 2px 10px #00000035}
+
+/* ── METRICS ── */
+.metrics{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:.72rem;margin-bottom:1.2rem}
+.metric{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:1rem .9rem;text-align:center}
+.metric .mn{font-size:1.65rem;font-weight:800;background:linear-gradient(135deg,var(--pl),var(--tl));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.metric .ml{font-size:.74rem;color:var(--mt);margin-top:.18rem}
+
+/* ── TABLE ── */
+.tbl-wrap{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:.87rem;min-width:460px}
+th{text-align:right;padding:.56rem .8rem;font-size:.77rem;font-weight:600;color:var(--mt);border-bottom:1px solid var(--bd);white-space:nowrap}
+td{padding:.6rem .8rem;border-bottom:1px solid var(--bd);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:var(--s2)}
+
+/* ── BADGE ── */
+.bdg{display:inline-flex;align-items:center;padding:.17rem .62rem;border-radius:99px;font-size:.77rem;font-weight:700}
+.b-gr{background:var(--g2);color:var(--grd)}.b-rd{background:var(--r2);color:var(--rd)}.b-yl{background:var(--gdb);color:var(--gd)}.b-bl{background:#001535;color:#5ba0ff}
+
+/* ── SUBJECT CARDS ── */
+.subj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:.9rem;margin-bottom:1.3rem}
+.subj-card{background:var(--s);border:1.5px solid var(--bd);border-radius:16px;padding:1.3rem 1.1rem;transition:border-color .2s,transform .15s,box-shadow .2s;position:relative;overflow:hidden}
+.subj-card:hover{transform:translateY(-3px)}
+.subj-card.kamy:hover{border-color:var(--pl);box-shadow:0 8px 30px rgba(108,53,222,.25)}
+.subj-card.gat:hover{border-color:var(--tl);box-shadow:0 8px 30px rgba(0,229,210,.2)}
+.subj-card.saat:hover{border-color:var(--gd);box-shadow:0 8px 30px rgba(240,165,0,.2)}
+.subj-card.tahsili:hover{border-color:var(--or);box-shadow:0 8px 30px rgba(255,107,53,.2)}
+.subj-icon{font-size:1.9rem;margin-bottom:.6rem;display:block}
+.subj-name{font-size:1rem;font-weight:800;margin-bottom:.25rem}
+.subj-meta{font-size:.8rem;color:var(--mt)}
+.subj-stats{display:flex;gap:.45rem;margin-top:.75rem;flex-wrap:wrap}
+.subj-stat{background:var(--s2);border-radius:6px;padding:.22rem .65rem;font-size:.77rem;font-weight:600}
+.status-pill{display:inline-flex;align-items:center;gap:4px;font-size:.77rem;padding:.18rem .6rem;border-radius:6px;font-weight:600;margin-top:.5rem}
+.s-ready{background:var(--g2);color:var(--grd)}.s-empty{background:var(--s3);color:var(--mt)}.s-loading{background:#1a1535;color:var(--pl)}
+
+/* ── UPLOAD ── */
+.upload-zone{border:2px dashed var(--bd2);border-radius:14px;padding:1.8rem 1rem;text-align:center;cursor:pointer;transition:.2s;position:relative}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--pl);background:rgba(108,53,222,.06)}
+.upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.upload-icon{font-size:2rem;display:block;margin-bottom:.55rem}
+.upload-t{font-size:.9rem;font-weight:700;margin-bottom:.3rem}
+.upload-s{font-size:.8rem;color:var(--mt)}
+.log-box{background:var(--s2);border-radius:9px;padding:.7rem .9rem;font-family:monospace;font-size:.79rem;max-height:130px;overflow-y:auto;line-height:1.7;margin-top:.6rem;min-height:38px}
+.log-ok{color:var(--grd)}.log-info{color:var(--tl)}.log-err{color:var(--rd)}.log-warn{color:var(--gd)}
+
+/* ── PROGRESS BAR ── */
+.pbar{height:5px;background:var(--bd);border-radius:99px;overflow:hidden;margin-top:4px}
+.pfill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--p),var(--t));transition:width .4s}
+
+/* ── TIMER ── */
+.timer-badge{background:var(--s2);border:1px solid var(--bd);border-radius:99px;padding:.28rem .85rem;font-size:.85rem;font-weight:700;font-family:monospace;color:var(--tl)}
+
+/* ── ALERTS ── */
+.alert{padding:.65rem .95rem;border-radius:9px;font-size:.86rem;margin-bottom:.7rem}
+.a-err{background:var(--r2);border:1px solid var(--rd);color:var(--rd)}.a-ok{background:var(--g2);border:1px solid var(--grd);color:var(--grd)}
+
+/* ── SETUP ── */
+#pg-setup{padding:2rem 1rem;max-width:680px;margin:auto}
+.setup-hero{text-align:center;padding:1.8rem 0 1.3rem}
+.setup-hero h1{font-size:1.85rem;font-weight:800}
+.step-card{background:var(--s);border:1px solid var(--bd);border-radius:15px;padding:1.3rem 1.4rem;margin-bottom:.85rem}
+.step-head{display:flex;align-items:center;gap:.7rem;margin-bottom:.65rem}
+.step-n{background:linear-gradient(135deg,var(--p),var(--t));color:#fff;width:27px;height:27px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.8rem;font-weight:800;flex-shrink:0}
+.step-title{font-size:.97rem;font-weight:700}
+.step-desc{color:var(--mt);font-size:.87rem;line-height:1.7;margin-bottom:.6rem}
+.code-box{background:var(--s2);border:1px solid var(--bd);border-radius:9px;padding:.85rem 1rem;font-family:monospace;font-size:.79rem;color:var(--tl);overflow-x:auto;white-space:pre;line-height:1.65;margin-bottom:.45rem}
+.copy-btn{background:var(--s2);border:1px solid var(--bd);color:var(--mt);font-size:.77rem;padding:.26rem .65rem;border-radius:7px;cursor:pointer;transition:.13s}
+.copy-btn:hover{border-color:var(--pl);color:var(--pl)}
+.hl{color:var(--pl);font-weight:700}
+
+/* ── LOGIN ── */
+#pg-login{display:flex;align-items:center;justify-content:center;min-height:100vh;padding:1rem}
+.login-box{width:100%;max-width:370px}
+.login-hero{text-align:center;margin-bottom:1.4rem}
+.login-hero .logo{font-size:2.3rem;display:block;margin-bottom:.45rem}
+.login-card{background:var(--s);border:1px solid var(--bd);border-radius:18px;padding:1.7rem 1.5rem;box-shadow:0 8px 40px #00000060}
+
+/* ── SEARCH ROW ── */
+.srow{display:flex;gap:.55rem;flex-wrap:wrap;margin-bottom:.9rem}
+.srow .inp{max-width:230px}
+
+/* ── EXPORT BTN ── */
+.export-btn{background:var(--s2);border:1px solid var(--bd);color:var(--mt);padding:.38rem .85rem;border-radius:9px;font-size:.82rem;font-weight:600;cursor:pointer;transition:.13s}
+.export-btn:hover{border-color:var(--tl);color:var(--tl)}
+
+/* ── DETAIL SECTION ── */
+.det-subject-tabs{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1rem}
+.det-stab{padding:.3rem .85rem;border-radius:8px;font-size:.82rem;font-weight:700;cursor:pointer;border:1px solid var(--bd);background:var(--s2);color:var(--mt);transition:.13s}
+.det-stab.on{background:linear-gradient(135deg,var(--p),var(--t));color:#fff;border-color:transparent}
+
+/* ── EMPTY STATE ── */
+.empty-state{text-align:center;padding:2rem 1rem;color:var(--mt)}
+.empty-icon{font-size:2.5rem;display:block;margin-bottom:.5rem}
+.empty-title{font-size:.95rem;font-weight:700;color:var(--tx);margin-bottom:.3rem}
+.empty-desc{font-size:.84rem}
+
+/* ── CHART BAR ── */
+.chart-wrap{display:flex;flex-direction:column;gap:.6rem}
+.chart-row{display:flex;align-items:center;gap:.75rem;font-size:.84rem}
+.chart-lbl{width:90px;text-align:left;flex-shrink:0;color:var(--mt);font-size:.78rem}
+.chart-bar-wrap{flex:1;height:8px;background:var(--bd);border-radius:99px;overflow:hidden}
+.chart-bar{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--p),var(--t))}
+.chart-val{width:45px;text-align:right;flex-shrink:0;font-weight:700;font-size:.82rem}
+
+/* ── SUBJECT SELECT ── */
+.subj-sel-card{background:var(--s);border:2px solid var(--bd);border-radius:14px;padding:1.2rem 1rem;text-align:center;cursor:pointer;transition:.18s}
+.subj-sel-card:hover{border-color:var(--pl);transform:translateY(-2px)}
+.subj-sel-card.selected{border-color:var(--pl);background:rgba(108,53,222,.12)}
+.subj-sel-icon{font-size:2rem;margin-bottom:.5rem}
+.subj-sel-name{font-size:.95rem;font-weight:700}
+
+/* ── RESPONSIVE ── */
+@media(max-width:580px){
+  .content{padding:1rem}
+  .topbar{padding:.6rem 1rem}
+  .metrics{grid-template-columns:1fr 1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- ════════════════════ SETUP ════════════════════ -->
+<div class="pg on" id="pg-setup">
+<div style="max-width:680px;margin:auto;padding:2rem 1rem">
+  <div class="setup-hero">
+    <div style="font-size:2.6rem;margin-bottom:.6rem">🎓</div>
+    <h1><span style="background:linear-gradient(135deg,#9d6bff,#00e5d2);-webkit-background-clip:text;-webkit-text-fill-color:transparent">منصة القصراوي</span></h1>
+    <p style="color:var(--mt);margin-top:.4rem;font-size:.92rem;line-height:1.9">قدرات · GAT<br>تحصيلي · SAAT</p>
+  </div>
+
+  <div class="step-card">
+    <div class="step-head"><div class="step-n">١</div><div class="step-title">أنشئ مشروعاً مجانياً في Supabase</div></div>
+    <div class="step-desc">افتح <span class="hl">supabase.com</span> ← Start your project ← سجّل بـ Google أو GitHub ← اضغط <span class="hl">New project</span> واختر اسماً</div>
+  </div>
+
+  <div class="step-card">
+    <div class="step-head"><div class="step-n">٢</div><div class="step-title">أنشئ الجداول — SQL Editor → الصق هذا وشغّله</div></div>
+    <div class="code-box" id="sql">-- جدول المستخدمين
+create table if not exists users (
+  id uuid default gen_random_uuid() primary key,
+  name text not null,
+  username text unique not null,
+  password text not null,
+  role text default 'student',
+  created_at timestamptz default now()
+);
+
+-- جدول الأقسام (المواد)
+create table if not exists sections (
+  id uuid default gen_random_uuid() primary key,
+  subject text not null,
+  section_num int not null,
+  questions_count int default 11,
+  created_at timestamptz default now(),
+  unique(subject, section_num)
+);
+
+-- جدول النتائج
+create table if not exists results (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references users(id) on delete cascade,
+  subject text not null,
+  section_num int not null,
+  correct int not null,
+  total int default 11,
+  duration_sec int not null,
+  score_pct int not null,
+  created_at timestamptz default now()
+);
+
+-- حساب الأدمن الافتراضي
+insert into users (name, username, password, role)
+values ('المشرف', 'admin', 'admin123', 'admin')
+on conflict (username) do nothing;
+
+-- صلاحيات مفتوحة
+alter table users enable row level security;
+alter table results enable row level security;
+alter table sections enable row level security;
+create policy "open" on users for all using (true) with check (true);
+create policy "open" on results for all using (true) with check (true);
+create policy "open" on sections for all using (true) with check (true);</div>
+    <button class="copy-btn" onclick="cpEl('sql',this)">📋 نسخ الكود</button>
+  </div>
+
+  <div class="step-card">
+    <div class="step-head"><div class="step-n">٣</div><div class="step-title">أدخل مفاتيح API</div></div>
+    <div class="step-desc">Supabase ← <span class="hl">Settings → API</span> ← انسخ Project URL و anon public key</div>
+    <div class="field"><label class="lbl">Project URL</label><input class="inp" id="cfg-url" type="text" placeholder="https://xxxx.supabase.co"></div>
+    <div class="field"><label class="lbl">Anon Key</label><input class="inp" id="cfg-key" type="text" placeholder="eyJhbGci... أو sb_publishable_..."></div>
+    <div id="cfg-msg" style="display:none;font-size:.86rem;margin-bottom:.5rem"></div>
+    <button class="btn bp btn-fw" onclick="saveConfig()">🚀 حفظ والدخول</button>
+    <button class="btn bg2" style="width:100%;margin-top:.5rem" onclick="useSaved()">✅ استخدام الإعداد المحفوظ</button>
+  </div>
+</div>
+</div>
+
+<!-- ════════════════════ LOGIN ════════════════════ -->
+<div class="pg" id="pg-login">
+<div class="login-box" style="max-width:480px">
+  <div class="login-hero">
+    <span class="logo">🎓</span>
+    <div style="font-size:1.6rem;font-weight:800">منصة القصراوي</div>
+    <div style="font-size:.85rem;color:var(--mt);margin-top:.3rem;line-height:1.9">
+      <div>قدرات · GAT</div><div>تحصيلي · SAAT</div>
+    </div>
+  </div>
+
+  <!-- الخطوة ١: اختيار المادة -->
+  <div id="li-step1">
+    <div style="margin-bottom:1rem"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;margin-bottom:.75rem">
+      <div class="subj-sel-card" onclick="selSubj('kamy',this)">
+        <div class="subj-sel-icon">📐</div>
+        <div class="subj-sel-name">قدرات كمي</div>
+      </div>
+      <div class="subj-sel-card" onclick="selSubj('gat',this)">
+        <div class="subj-sel-icon">🎯</div>
+        <div class="subj-sel-name">GAT</div>
+      </div>
+      <div class="subj-sel-card" onclick="selSubj('tahsili',this)">
+        <div class="subj-sel-icon">📚</div>
+        <div class="subj-sel-name">تحصيلي</div>
+      </div>
+      <div class="subj-sel-card" onclick="selSubj('saat',this)">
+        <div class="subj-sel-icon">⚡</div>
+        <div class="subj-sel-name">SAAT</div>
+      </div>
+    </div>
+    <div id="subj-err" style="font-size:.83rem;color:var(--rd);text-align:center;min-height:1.2rem"></div>
+    <button class="btn bp btn-fw" style="margin-top:.4rem" onclick="goStep2()">التالي ←</button>
+    <div style="text-align:center;margin-top:.65rem">
+      <span style="font-size:.82rem;color:var(--mt)">أدمن أو عدة مواد؟ </span>
+      <span style="font-size:.82rem;color:var(--pl);cursor:pointer;font-weight:700" onclick="skipStep()">دخول مباشر ←</span>
+    </div>
+  </div>
+
+  <!-- الخطوة ٢: تسجيل الدخول -->
+  <div id="li-step2" style="display:none">
+    <div class="login-card">
+      <div id="li-subj-badge" style="text-align:center;margin-bottom:.85rem"></div>
+      <div id="li-msg" style="display:none;margin-bottom:.7rem"></div>
+      <div class="field"><label class="lbl">اسم المستخدم</label><input class="inp" id="li-u" type="text" placeholder="username" autocomplete="off"></div>
+      <div class="field"><label class="lbl">كلمة المرور</label><input class="inp" id="li-p" type="password" placeholder="password" onkeydown="if(event.key==='Enter')doLogin()"></div>
+      <button class="btn bp btn-fw" onclick="doLogin()" id="li-btn">🔐 دخول</button>
+      <button class="btn bg2" style="width:100%;margin-top:.45rem;font-size:.84rem" onclick="goStep1()">← اختيار المادة</button>
+    </div>
+  </div>
+</div>
+</div>
+
+<div class="pg" id="pg-admin">
+  <div class="topbar">
+    <div class="topbar-logo">🎓 منصة القصراوي</div>
+    <div class="topbar-right">
+      <div class="user-chip"><div class="av" id="adm-av">م</div><span id="adm-nm">الأدمن</span></div>
+      <button class="btn bp btn-sm" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+  <div class="content">
+    <div class="tabs" id="adm-tabs">
+      <div class="tab on"  onclick="aTab('overview',0)">📊 نظرة عامة</div>
+      <div class="tab"     onclick="aTab('students',1)">👥 الطلاب</div>
+      <div class="tab"     onclick="aTab('upload',2)">📂 رفع الملفات</div>
+      <div class="tab"     onclick="aTab('accounts',3)">⚙️ الحسابات</div>
+      <div class="tab"     onclick="aTab('stats',4)">📈 إحصائيات</div>
+    </div>
+
+    <!-- ── OVERVIEW ── -->
+    <div id="tab-overview">
+      <div class="metrics" id="adm-metrics"></div>
+      <div class="subj-grid" id="subj-cards"></div>
+      <div class="card">
+        <div class="card-title" style="justify-content:space-between">
+          <span>📋 آخر نشاط الطلاب</span>
+          <button class="export-btn" onclick="exportCSV()">⬇️ تصدير CSV</button>
+        </div>
+        <div id="adm-activity"></div>
+      </div>
+    </div>
+
+    <!-- ── STUDENTS ── -->
+    <div id="tab-students" style="display:none">
+      <div class="srow">
+        <input class="inp" id="sq" placeholder="🔍 بحث بالاسم..." oninput="renderStudents()">
+        <select class="inp" id="sf-subj" onchange="renderStudents()" style="max-width:170px">
+          <option value="">كل المواد</option>
+          <option value="kamy">قدرات كمي</option>
+          <option value="gat">GAT</option>
+          <option value="saat">SAAT</option>
+          <option value="tahsili">تحصيلي</option>
+        </select>
+        <select class="inp" id="sf-perf" onchange="renderStudents()" style="max-width:180px">
+          <option value="">كل الطلاب</option>
+          <option value="high">متفوق ≥80%</option>
+          <option value="med">متوسط 50-79%</option>
+          <option value="low">يحتاج دعم &lt;50%</option>
+          <option value="active">نشط (آخر 7 أيام)</option>
+        </select>
+      </div>
+      <div class="card" style="padding:.5rem">
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>الطالب</th><th>اختبارات</th><th>متوسط</th><th>أعلى درجة</th><th>آخر نشاط</th><th></th></tr></thead>
+          <tbody id="stbl"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── UPLOAD ── -->
+    <div id="tab-upload" style="display:none">
+      <div class="card">
+        <div class="card-title">📂 رفع ملفات الأقسام</div>
+        <p style="font-size:.86rem;color:var(--mt);margin-bottom:1.1rem">ارفع ملف ZIP أو PDF لكل مادة — سيتم تسجيل الأقسام تلقائياً في قاعدة البيانات</p>
+        <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:1rem">
+          <!-- KAMY -->
+          <div style="background:var(--s2);border-radius:14px;padding:1.1rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+              <div style="font-weight:700">📐 قدرات كمي</div>
+              <span class="status-pill s-ready" id="st-kamy">✅ متاح</span>
+            </div>
+            <div class="upload-zone" id="dz-kamy" ondragover="dzo(event,'dz-kamy')" ondragleave="dzl('dz-kamy')" ondrop="dzd(event,'kamy')">
+              <input type="file" accept=".zip,.html,.pdf" onchange="handleUp(this,'kamy')">
+              <span class="upload-icon">📦</span>
+              <div class="upload-t">اسحب الملف أو اضغط</div>
+              <div class="upload-s">.zip / .pdf / .html</div>
+            </div>
+            <div class="log-box" id="log-kamy"></div>
+          </div>
+          <!-- GAT -->
+          <div style="background:var(--s2);border-radius:14px;padding:1.1rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+              <div style="font-weight:700">🎯 GAT</div>
+              <span class="status-pill s-empty" id="st-gat">⬜ لا يوجد</span>
+            </div>
+            <div class="upload-zone" id="dz-gat" ondragover="dzo(event,'dz-gat')" ondragleave="dzl('dz-gat')" ondrop="dzd(event,'gat')">
+              <input type="file" accept=".zip,.html,.pdf" onchange="handleUp(this,'gat')">
+              <span class="upload-icon">📦</span>
+              <div class="upload-t">اسحب الملف أو اضغط</div>
+              <div class="upload-s">.zip / .pdf / .html</div>
+            </div>
+            <div class="log-box" id="log-gat"></div>
+          </div>
+          <!-- SAAT -->
+          <div style="background:var(--s2);border-radius:14px;padding:1.1rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+              <div style="font-weight:700">⚡ SAAT</div>
+              <span class="status-pill s-empty" id="st-saat">⬜ لا يوجد</span>
+            </div>
+            <div class="upload-zone" id="dz-saat" ondragover="dzo(event,'dz-saat')" ondragleave="dzl('dz-saat')" ondrop="dzd(event,'saat')">
+              <input type="file" accept=".zip,.html,.pdf" onchange="handleUp(this,'saat')">
+              <span class="upload-icon">📦</span>
+              <div class="upload-t">اسحب الملف أو اضغط</div>
+              <div class="upload-s">.zip / .pdf / .html</div>
+            </div>
+            <div class="log-box" id="log-saat"></div>
+          </div>
+          <!-- TAHSILI -->
+          <div style="background:var(--s2);border-radius:14px;padding:1.1rem">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem">
+              <div style="font-weight:700">📚 تحصيلي</div>
+              <span class="status-pill s-empty" id="st-tahsili">⬜ لا يوجد</span>
+            </div>
+            <div class="upload-zone" id="dz-tahsili" ondragover="dzo(event,'dz-tahsili')" ondragleave="dzl('dz-tahsili')" ondrop="dzd(event,'tahsili')">
+              <input type="file" accept=".zip,.html,.pdf" onchange="handleUp(this,'tahsili')">
+              <span class="upload-icon">📦</span>
+              <div class="upload-t">اسحب الملف أو اضغط</div>
+              <div class="upload-s">.zip / .pdf / .html</div>
+            </div>
+            <div class="log-box" id="log-tahsili"></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:.6rem">
+        <div class="card-title" style="padding:.3rem .4rem">📋 الأقسام المسجّلة</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>المادة</th><th>رقم القسم</th><th>الأسئلة</th><th>تاريخ الإضافة</th><th>حذف</th></tr></thead>
+          <tbody id="sectbl"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── ACCOUNTS ── -->
+    <div id="tab-accounts" style="display:none">
+      <div class="card">
+        <div class="card-title">➕ إضافة طالب جديد</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:.7rem">
+          <div><label class="lbl">الاسم الكامل</label><input class="inp" id="n-name" placeholder="اسم الطالب"></div>
+          <div><label class="lbl">اسم المستخدم</label><input class="inp" id="n-user" placeholder="username"></div>
+          <div><label class="lbl">كلمة المرور</label><input class="inp" id="n-pass" type="password" placeholder="password"></div>
+        </div>
+        <div id="add-msg" style="font-size:.85rem;min-height:1.2rem;margin-bottom:.3rem"></div>
+        <button class="btn bp" style="padding:.62rem 1.4rem" onclick="addStudent()">✅ إضافة</button>
+      </div>
+      <div class="card" style="padding:.6rem">
+        <div class="card-title" style="padding:.3rem .4rem">🗂️ حسابات الطلاب</div>
+        <div class="tbl-wrap"><table>
+          <thead><tr><th>الاسم</th><th>المستخدم</th><th>اختبارات</th><th>آخر دخول</th><th>حذف</th></tr></thead>
+          <tbody id="mgmttbl"></tbody>
+        </table></div>
+      </div>
+    </div>
+
+    <!-- ── STATS ── -->
+    <div id="tab-stats" style="display:none">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
+        <div class="card">
+          <div class="card-title">📊 أداء المواد</div>
+          <div id="subj-chart" class="chart-wrap"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">🏆 أفضل الطلاب</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead>
+            <tbody id="top-tbl"></tbody>
+          </table></div>
+        </div>
+        <div class="card">
+          <div class="card-title">📅 نشاط آخر 7 أيام</div>
+          <div id="week-chart" class="chart-wrap"></div>
+        </div>
+        <div class="card">
+          <div class="card-title">⚠️ يحتاجون دعماً (أقل من 50%)</div>
+          <div class="tbl-wrap"><table>
+            <thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead>
+            <tbody id="weak-tbl"></tbody>
+          </table></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ════════════════════ DETAIL ════════════════════ -->
+<div class="pg" id="pg-detail">
+  <div class="topbar">
+    <div class="topbar-logo">🎓 منصة القصراوي</div>
+    <div class="topbar-right">
+      <button class="btn bg2 btn-sm" onclick="back()">← رجوع</button>
+    </div>
+  </div>
+  <div class="content">
+    <div id="det-header" style="margin-bottom:1rem"></div>
+    <div class="metrics" id="det-metrics"></div>
+    <div class="det-subject-tabs" id="det-stabs"></div>
+    <div class="card">
+      <div class="card-title">📝 سجل الاختبارات</div>
+      <div class="tbl-wrap" id="det-table"></div>
+    </div>
+    <div class="card" id="det-err-card">
+      <div class="card-title">⚠️ الأقسام الأضعف</div>
+      <div id="det-errors"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ STUDENT ════════════════════ -->
+<div class="pg" id="pg-student">
+  <div class="topbar">
+    <div class="topbar-logo">🎓 منصة القصراوي</div>
+    <div class="topbar-right">
+      <div class="timer-badge" id="timer-badge" style="display:none">⏱ 00:00</div>
+      <div class="user-chip"><div class="av" id="stu-av">ط</div><span id="stu-nm">طالب</span></div>
+      <button class="btn bp btn-sm" onclick="doLogout()">خروج</button>
+    </div>
+  </div>
+  <div class="content">
+    <div style="margin-bottom:1.1rem">
+      <div style="font-size:1.25rem;font-weight:800" id="stu-hi"></div>
+      <div style="font-size:.83rem;color:var(--mt)">لوحة اختباراتي</div>
+    </div>
+
+    <div class="metrics" id="stu-metrics"></div>
+
+    <div class="subj-grid" id="stu-subj"></div>
+
+    <div class="card">
+      <div class="card-title" style="justify-content:space-between">
+        <span>📊 سجل اختباراتي</span>
+        <div style="display:flex;gap:.5rem;align-items:center">
+          <select class="inp" id="his-filter" onchange="filterHistory()" style="width:auto;padding:.3rem .7rem;font-size:.8rem">
+            <option value="">كل المواد</option>
+            <option value="kamy">قدرات كمي</option>
+            <option value="gat">GAT</option>
+            <option value="saat">SAAT</option>
+            <option value="tahsili">تحصيلي</option>
+          </select>
+        </div>
+      </div>
+      <div class="tbl-wrap" id="stu-table"></div>
+    </div>
+
+    <!-- تسجيل نتيجة -->
+    <div class="card" style="border:1px solid var(--p)">
+      <div class="card-title" style="color:var(--pl)">📥 تسجيل نتيجة اختبار</div>
+      <p style="font-size:.84rem;color:var(--mt);margin-bottom:.9rem">بعد إنهاء قسم من المنصة، سجّل نتيجتك هنا — سيتم حفظها تلقائياً</p>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin-bottom:.65rem">
+        <div>
+          <label class="lbl">المادة</label>
+          <select class="inp" id="r-subj" onchange="loadSections()" style="cursor:pointer">
+            <option value="">اختر المادة...</option>
+            <option value="kamy">📐 قدرات كمي</option>
+            <option value="gat">🎯 GAT</option>
+            <option value="saat">⚡ SAAT</option>
+            <option value="tahsili">📚 تحصيلي</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">رقم القسم</label>
+          <select class="inp" id="r-sec" style="cursor:pointer">
+            <option value="">اختر القسم...</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">الإجابات الصحيحة</label>
+          <select class="inp" id="r-cor" style="cursor:pointer">
+            <option value="">من 11</option>
+          </select>
+        </div>
+        <div>
+          <label class="lbl">الوقت (دقيقة)</label>
+          <input class="inp" id="r-dur" type="number" min="1" max="120" placeholder="مثال: 8">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap">
+        <button class="btn bp" style="padding:.62rem 1.4rem" onclick="submitResult()">💾 تسجيل النتيجة</button>
+        <button class="btn bg2 btn-sm" onclick="toggleTimer()" id="timer-btn">⏱ بدء المؤقت</button>
+        <span id="r-msg" style="font-size:.85rem"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ════════════════════ JAVASCRIPT ════════════════════ -->
+<script>
+/* ─── GLOBALS ─── */
+let SB_URL='https://fnzzdracebdkcvtigris.supabase.co', SB_KEY='sb_publishable_BPccEAh0KTTn4YMnNDL_JQ_GMlW3vr1';
+let _sbClient=null;
+let me=null, allStudents=[], allResults=[], allSections=[];
+let myResults=[];
+let timerInt=null, timerSec=0, timerRunning=false;
+let prevAdminTab='overview';
+
+const SUBJ={
+  kamy:{n:'قدرات كمي',ic:'📐',cl:'kamy'},
+  gat:{n:'GAT',ic:'🎯',cl:'gat'},
+  saat:{n:'SAAT',ic:'⚡',cl:'saat'},
+  tahsili:{n:'تحصيلي',ic:'📚',cl:'tahsili'}
+};
+
+/* ─── SUBJECT SELECT ─── */
+let selectedSubj = '';
+
+function selectSubj(subj, el){
+  selectedSubj = subj;
+  document.querySelectorAll('.subj-sel-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('subj-msg').textContent = '';
+}
+
+function goToLogin(){
+  if(!selectedSubj){
+    document.getElementById('subj-msg').textContent = 'اختر مادة أولاً';
+    return;
+  }
+  const names = {kamy:'📐 قدرات كمي', gat:'🎯 GAT', tahsili:'📚 تحصيلي', saat:'⚡ SAAT'};
+  document.getElementById('li-subj-badge').innerHTML =
+    `<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--p),var(--t));color:#fff;padding:.35rem 1rem;border-radius:99px;font-size:.85rem;font-weight:700">${names[selectedSubj]}</div>`;
+  document.getElementById('li-step1').style.display = 'none';
+  document.getElementById('li-step2').style.display = 'block';
+  setTimeout(()=>document.getElementById('li-u').focus(), 100);
+}
+
+function backToSubj(){
+  document.getElementById('li-step1').style.display = 'block';
+  document.getElementById('li-step2').style.display = 'none';
+  document.getElementById('li-msg').style.display = 'none';
+}
+
+function skipSubj(){
+  selectedSubj = '';
+  document.getElementById('li-subj-badge').innerHTML = '';
+  document.getElementById('li-step1').style.display = 'none';
+  document.getElementById('li-step2').style.display = 'block';
+  setTimeout(()=>document.getElementById('li-u').focus(), 100);
+}
+
+/* ─── SUBJECT SELECT ─── */
+let selectedSubj='';
+
+function selSubj(subj,el){
+  selectedSubj=subj;
+  document.querySelectorAll('.subj-sel-card').forEach(c=>c.classList.remove('selected'));
+  el.classList.add('selected');
+  document.getElementById('subj-err').textContent='';
+}
+
+function goStep2(){
+  if(!selectedSubj){document.getElementById('subj-err').textContent='يرجى اختيار مادة أولاً';return;}
+  const names={kamy:'📐 قدرات كمي',gat:'🎯 GAT',tahsili:'📚 تحصيلي',saat:'⚡ SAAT'};
+  document.getElementById('li-subj-badge').innerHTML=
+    `<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--p),var(--t));color:#fff;padding:.32rem .9rem;border-radius:99px;font-size:.85rem;font-weight:700">${names[selectedSubj]}</div>`;
+  document.getElementById('li-step1').style.display='none';
+  document.getElementById('li-step2').style.display='block';
+  setTimeout(()=>{var u=document.getElementById('li-u');if(u)u.focus();},100);
+}
+
+function goStep1(){
+  document.getElementById('li-step1').style.display='block';
+  document.getElementById('li-step2').style.display='none';
+  var m=document.getElementById('li-msg');if(m)m.style.display='none';
+}
+
+function skipStep(){
+  selectedSubj='';
+  document.getElementById('li-subj-badge').innerHTML='<div style="text-align:center;font-size:.82rem;color:var(--mt)">دخول كمشرف أو متعدد المواد</div>';
+  document.getElementById('li-step1').style.display='none';
+  document.getElementById('li-step2').style.display='block';
+  setTimeout(()=>{var u=document.getElementById('li-u');if(u)u.focus();},100);
+}
+
+/* ─── CONFIG ─── */
+function saveConfig(){
+  var urlEl = document.getElementById('cfg-url');
+  var keyEl = document.getElementById('cfg-key');
+  if(!urlEl||!keyEl) return;
+  var url = urlEl.value.trim();
+  var key = keyEl.value.trim();
+  if(!url||!key){
+    alert('يرجى إدخال Project URL وAnon Key');
+    return;
+  }
+  // تنظيف URL
+  while(url.length>0 && url[url.length-1]=='/') url=url.slice(0,-1);
+  SB_URL = 'https://' + url;
+  SB_KEY = key;
+  _sbClient = null;
+  localStorage.setItem('qk_url', SB_URL);
+  localStorage.setItem('qk_key', SB_KEY);
+  var pages = document.querySelectorAll('.pg');
+  for(var i=0;i<pages.length;i++) pages[i].classList.remove('on');
+  var lp = document.getElementById('pg-login');
+  if(lp){ lp.classList.add('on'); window.scrollTo(0,0); }
+}
+
+function useSaved(){
+  const url=localStorage.getItem('qk_url'),key=localStorage.getItem('qk_key');
+  if(!url||!key){showMsg('cfg-msg','لا يوجد إعداد محفوظ','err');return;}
+  SB_URL=url; SB_KEY=key;
+  showPg('pg-login');
+}
+function goSetup(){
+  E('cfg-url').value=localStorage.getItem('qk_url')||'';
+  E('cfg-key').value=localStorage.getItem('qk_key')||'';
+  showPg('pg-setup');
+}
+
+/* ─── SUPABASE ─── */
+function getSB(){
+  if(!_sbClient){
+    const cleanURL = SB_URL;
+    _sbClient = supabase.createClient(cleanURL, SB_KEY);
+  }
+  return _sbClient;
+}
+
+async function sb(method, table, query='', body=null){
+  const client = getSB();
+  let req = client.from(table);
+
+  if(method === 'GET'){
+    // parse query string
+    const params = new URLSearchParams(query);
+    let sel = params.get('select') || '*';
+    req = req.select(sel);
+    // filters
+    for(const [k,v] of params.entries()){
+      if(k==='select'||k==='order'||k==='limit') continue;
+      const m = k.match(/^(.+)=(.+)$/);
+      if(v.startsWith('eq.')){req = req.eq(k.replace(/=.+$/,''), v.replace('eq.',''));}
+    }
+    // handle eq. filters from query like "role=eq.student"
+    if(query){
+      const parts = query.split('&');
+      for(const p of parts){
+        const [key,val] = p.split('=');
+        if(!key||!val) continue;
+        if(val.startsWith('eq.')){req = req.eq(key, decodeURIComponent(val.replace('eq.','')));}
+        if(key==='order'){const [col,dir]=val.split('.');req=req.order(col,{ascending:dir!=='desc'});}
+        if(key==='limit') req=req.limit(parseInt(val));
+      }
+    }
+    const {data,error} = await req;
+    if(error) throw new Error(error.message||error.hint||'خطأ في القراءة');
+    return data||[];
+  }
+
+  if(method === 'POST'){
+    const rows = Array.isArray(body)?body:[body];
+    const {data,error} = await req.insert(rows).select();
+    if(error) throw new Error(error.message||error.hint||'خطأ في الإضافة');
+    return data||[];
+  }
+
+  if(method === 'DELETE'){
+    const parts = query.split('&');
+    for(const p of parts){
+      const [key,val] = p.split('=');
+      if(val&&val.startsWith('eq.')){req=req.eq(key,decodeURIComponent(val.replace('eq.','')));}
+    }
+    const {error} = await req.delete();
+    if(error) throw new Error(error.message||'خطأ في الحذف');
+    return [];
+  }
+
+  if(method === 'PATCH'||method === 'PUT'){
+    const {data,error} = await req.update(body).select();
+    if(error) throw new Error(error.message||'خطأ في التعديل');
+    return data||[];
+  }
+}
+
+/* ─── AUTH ─── */
+async function doLogin(){
+  const u=V('li-u').trim(), p=V('li-p').trim();
+  const btn=E('li-btn'); btn.textContent='⏳ جارٍ التحقق...'; btn.disabled=true;
+  try{
+    const rows=await sb('GET','users',`username=eq.${encodeURIComponent(u)}&password=eq.${encodeURIComponent(p)}&select=*`);
+    if(!rows.length){showMsg('li-msg','اسم المستخدم أو كلمة المرور غير صحيحة','err');return;}
+    me=rows[0]; E('li-msg').style.display='none';
+    if(me.role==='admin') await loadAdmin();
+    else await loadStudent();
+  }catch(e){const errMsg = e.message.includes('401')||e.message.includes('403') ? 
+      'خطأ في المفاتيح - تحقق من Project URL وAnon Key' :
+      e.message.includes('Failed to fetch')||e.message.includes('NetworkError') ?
+      'لا يمكن الاتصال - تحقق من Project URL' :
+      'خطأ: '+e.message;
+    showMsg('li-msg',errMsg,'err');}
+  finally{btn.textContent='🔐 دخول'; btn.disabled=false;}
+}
+function doLogout(){
+  me=null; stopTimer();
+  showPg('pg-login');
+}
+
+/* ─── ADMIN ─── */
+async function loadAdmin(){
+  showPg('pg-admin');
+  E('adm-av').textContent=me.name[0];
+  E('adm-nm').textContent=me.name;
+  await refreshAdmin();
+}
+
+async function refreshAdmin(){
+  try{
+    [allStudents,allResults,allSections]=await Promise.all([
+      sb('GET','users','role=eq.student&select=*&order=created_at.desc'),
+      sb('GET','results','select=*,users(name)&order=created_at.desc'),
+      sb('GET','sections','select=*&order=subject.asc,section_num.asc')
+    ]);
+    renderOverview();
+    renderStudents();
+    renderMgmt();
+    renderSecTbl();
+    renderStats();
+    updateUploadStatus();
+  }catch(e){console.error('refreshAdmin:',e);}
+}
+
+function aTab(name,idx){
+  document.querySelectorAll('#adm-tabs .tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
+  ['overview','students','upload','accounts','stats'].forEach(t=>E('tab-'+t).style.display=t===name?'':'none');
+  prevAdminTab=name;
+}
+
+/* ─── OVERVIEW ─── */
+function renderOverview(){
+  const now=Date.now();
+  const activeToday=new Set(allResults.filter(r=>isToday(r.created_at)).map(r=>r.user_id)).size;
+  const avg=allResults.length?Math.round(allResults.reduce((s,r)=>s+r.score_pct,0)/allResults.length):0;
+  E('adm-metrics').innerHTML=`
+    <div class="metric"><div class="mn">${allStudents.length}</div><div class="ml">إجمالي الطلاب</div></div>
+    <div class="metric"><div class="mn">${allResults.length}</div><div class="ml">اختبارات منجزة</div></div>
+    <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط الدرجات</div></div>
+    <div class="metric"><div class="mn">${activeToday}</div><div class="ml">نشط اليوم</div></div>
+    <div class="metric"><div class="mn">${allSections.length}</div><div class="ml">أقسام مسجّلة</div></div>`;
+
+  E('subj-cards').innerHTML=Object.entries(SUBJ).map(([k,s])=>{
+    const rs=allResults.filter(r=>r.subject===k);
+    const secs=allSections.filter(x=>x.subject===k).length;
+    const avg2=rs.length?Math.round(rs.reduce((a,r)=>a+r.score_pct,0)/rs.length):0;
+    return `<div class="subj-card ${s.cl}">
+      <span class="subj-icon">${s.ic}</span>
+      <div class="subj-name">${s.n}</div>
+      <span class="status-pill ${secs?'s-ready':'s-empty'}">${secs?'✅ '+secs+' قسم':'⬜ لا يوجد ملف'}</span>
+      <div class="subj-stats">
+        <div class="subj-stat">${rs.length} اختبار</div>
+        ${rs.length?`<div class="subj-stat" style="color:var(--pl)">${avg2}% متوسط</div>`:''}
+      </div>
+    </div>`;
+  }).join('');
+
+  const last=allResults.slice(0,12);
+  E('adm-activity').innerHTML=last.length?`<div class="tbl-wrap"><table>
+    <thead><tr><th>الطالب</th><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
+    <tbody>${last.map(r=>`<tr>
+      <td><div style="display:flex;align-items:center;gap:.4rem"><div class="av" style="width:24px;height:24px;font-size:.7rem">${(r.users?.name||'؟')[0]}</div>${r.users?.name||'—'}</div></td>
+      <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
+      <td>القسم ${r.section_num}</td>
+      <td>${bdg(r.score_pct)}</td>
+      <td><span style="color:var(--grd)">✅${r.correct}</span>/<span style="color:var(--rd)">❌${r.total-r.correct}</span></td>
+      <td style="font-size:.8rem">${fmtD(r.duration_sec)}</td>
+      <td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
+    </tr>`).join('')}</tbody>
+  </table></div>`
+  :`<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">لا يوجد نشاط بعد</div><div class="empty-desc">ستظهر هنا نتائج الطلاب بعد بدء الاختبارات</div></div>`;
+}
+
+/* ─── STUDENTS ─── */
+function renderStudents(){
+  const q=(V('sq')||'').toLowerCase();
+  const subj=V('sf-subj');
+  const perf=V('sf-perf');
+  const now=Date.now();
+  const list=allStudents.filter(u=>{
+    if(q&&!u.name.toLowerCase().includes(q)&&!u.username.toLowerCase().includes(q)) return false;
+    const rs=allResults.filter(r=>r.user_id===u.id&&(!subj||r.subject===subj));
+    const avg=rs.length?rs.reduce((s,r)=>s+r.score_pct,0)/rs.length:null;
+    if(perf==='high'&&(avg===null||avg<80)) return false;
+    if(perf==='med'&&(avg===null||avg<50||avg>=80)) return false;
+    if(perf==='low'&&(avg===null||avg>=50)) return false;
+    if(perf==='active'&&!rs.some(r=>now-new Date(r.created_at).getTime()<7*86400000)) return false;
+    return true;
+  });
+  E('stbl').innerHTML=list.length?list.map(u=>{
+    const rs=allResults.filter(r=>r.user_id===u.id);
+    const avg=rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):null;
+    const best=rs.length?Math.max(...rs.map(r=>r.score_pct)):null;
+    const last=rs.length?rs.sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0].created_at:null;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:.4rem"><div class="av" style="width:26px;height:26px;font-size:.73rem">${u.name[0]}</div>${u.name}</div></td>
+      <td>${rs.length}</td>
+      <td>${avg!==null?bdg(avg):'<span style="color:var(--mt)">—</span>'}</td>
+      <td>${best!==null?`<span style="color:var(--grd);font-weight:700">${best}%</span>`:'—'}</td>
+      <td style="font-size:.79rem;color:var(--mt)">${last?fmtDate(last):'—'}</td>
+      <td><button class="btn btn-sm" style="background:var(--s2);border:1px solid var(--bd);color:var(--tl)" onclick="showDetail('${u.id}','${u.name}')">👁 تفاصيل</button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="6"><div class="empty-state" style="padding:1rem"><div class="empty-desc">لا توجد نتائج</div></div></td></tr>`;
+}
+
+/* ─── MGMT ─── */
+function renderMgmt(){
+  E('mgmttbl').innerHTML=allStudents.length?allStudents.map(u=>{
+    const cnt=allResults.filter(r=>r.user_id===u.id).length;
+    const last=allResults.filter(r=>r.user_id===u.id).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at))[0]?.created_at;
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:.4rem"><div class="av" style="width:25px;height:25px;font-size:.7rem">${u.name[0]}</div>${u.name}</div></td>
+      <td style="color:var(--mt)">${u.username}</td>
+      <td>${cnt}</td>
+      <td style="font-size:.78rem;color:var(--mt)">${last?fmtDate(last):'لم يدخل بعد'}</td>
+      <td><button class="btn btn-sm btn-danger" onclick="delStudent('${u.id}','${u.name}')">🗑 حذف</button></td>
+    </tr>`;
+  }).join(''):`<tr><td colspan="5"><div class="empty-state" style="padding:1rem"><div class="empty-desc">لا يوجد طلاب مضافون بعد</div></div></td></tr>`;
+}
+
+function renderSecTbl(){
+  E('sectbl').innerHTML=allSections.length?allSections.map(s=>`<tr>
+    <td>${SUBJ[s.subject]?.ic||''} ${SUBJ[s.subject]?.n||s.subject}</td>
+    <td>القسم ${s.section_num}</td>
+    <td>${s.questions_count} سؤال</td>
+    <td style="font-size:.78rem;color:var(--mt)">${fmtDate(s.created_at)}</td>
+    <td><button class="btn btn-sm btn-danger" onclick="delSection('${s.id}')">🗑</button></td>
+  </tr>`).join(''):`<tr><td colspan="5"><div class="empty-state" style="padding:1rem"><div class="empty-desc">لا يوجد أقسام مسجّلة بعد</div></div></td></tr>`;
+}
+
+/* ─── STATS ─── */
+function renderStats(){
+  // أداء المواد
+  E('subj-chart').innerHTML=Object.entries(SUBJ).map(([k,s])=>{
+    const rs=allResults.filter(r=>r.subject===k);
+    const avg=rs.length?Math.round(rs.reduce((a,r)=>a+r.score_pct,0)/rs.length):0;
+    return `<div class="chart-row">
+      <div class="chart-lbl">${s.ic} ${s.n}</div>
+      <div class="chart-bar-wrap"><div class="chart-bar" style="width:${avg}%"></div></div>
+      <div class="chart-val">${rs.length?avg+'%':'—'}</div>
+    </div>`;
+  }).join('');
+
+  // أفضل الطلاب
+  const tops=allStudents.map(u=>{
+    const rs=allResults.filter(r=>r.user_id===u.id);
+    return{...u,avg:rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):0,cnt:rs.length};
+  }).filter(u=>u.cnt>0).sort((a,b)=>b.avg-a.avg).slice(0,5);
+  E('top-tbl').innerHTML=tops.length?tops.map((u,i)=>`<tr>
+    <td><div style="display:flex;align-items:center;gap:.4rem">${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${u.name}</div></td>
+    <td>${bdg(u.avg)}</td>
+    <td>${u.cnt}</td>
+  </tr>`).join(''):`<tr><td colspan="3" style="text-align:center;color:var(--mt);padding:.8rem">لا يوجد بيانات</td></tr>`;
+
+  // الضعاف
+  const weak=allStudents.map(u=>{
+    const rs=allResults.filter(r=>r.user_id===u.id);
+    return{...u,avg:rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):null,cnt:rs.length};
+  }).filter(u=>u.avg!==null&&u.avg<50).sort((a,b)=>a.avg-b.avg).slice(0,5);
+  E('weak-tbl').innerHTML=weak.length?weak.map(u=>`<tr>
+    <td>${u.name}</td><td>${bdg(u.avg)}</td><td>${u.cnt}</td>
+  </tr>`).join(''):`<tr><td colspan="3" style="text-align:center;color:var(--mt);padding:.8rem">لا يوجد</td></tr>`;
+
+  // نشاط الأسبوع
+  const days=['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس','الجمعة','السبت'];
+  const now=new Date(); const weekData=[];
+  for(let d=6;d>=0;d--){
+    const dt=new Date(now); dt.setDate(dt.getDate()-d);
+    const cnt=allResults.filter(r=>{const rd=new Date(r.created_at);return rd.getDate()===dt.getDate()&&rd.getMonth()===dt.getMonth();}).length;
+    weekData.push({day:days[dt.getDay()],cnt});
+  }
+  const maxW=Math.max(...weekData.map(d=>d.cnt),1);
+  E('week-chart').innerHTML=weekData.map(d=>`<div class="chart-row">
+    <div class="chart-lbl">${d.day}</div>
+    <div class="chart-bar-wrap"><div class="chart-bar" style="width:${d.cnt/maxW*100}%"></div></div>
+    <div class="chart-val">${d.cnt}</div>
+  </div>`).join('');
+}
+
+/* ─── ADD/DELETE ─── */
+async function addStudent(){
+  const name=V('n-name').trim(), user=V('n-user').trim(), pass=V('n-pass').trim();
+  const msg=E('add-msg');
+  if(!name||!user||!pass){setTxt(msg,'يرجى تعبئة جميع الحقول','rd');return;}
+  try{
+    await sb('POST','users','',[{name,username:user,password:pass,role:'student'}]);
+    setTxt(msg,'تم إضافة الطالب ✅','grd');
+    E('n-name').value=''; E('n-user').value=''; E('n-pass').value='';
+    await refreshAdmin();
+  }catch(e){setTxt(msg,'خطأ: '+e.message,'rd');}
+}
+async function delStudent(id,name){
+  if(!confirm('حذف الطالب '+name+' وجميع نتائجه؟')) return;
+  try{await sb('DELETE','results','user_id=eq.'+id);await sb('DELETE','users','id=eq.'+id);await refreshAdmin();}
+  catch(e){alert(e.message);}
+}
+async function delSection(id){
+  if(!confirm('حذف هذا القسم من السجل؟')) return;
+  try{await sb('DELETE','sections','id=eq.'+id);await refreshAdmin();}
+  catch(e){alert(e.message);}
+}
+
+/* ─── DETAIL ─── */
+let detUid='', detFilterVal='';
+function showDetail(uid,name){
+  detUid=uid; detFilterVal='';
+  const rs=allResults.filter(r=>r.user_id===uid).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  const avg=rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):0;
+  const best=rs.length?Math.max(...rs.map(r=>r.score_pct)):0;
+  const avgD=rs.length?Math.round(rs.reduce((s,r)=>s+r.duration_sec,0)/rs.length):0;
+  const wrongs=rs.reduce((s,r)=>s+(r.total-r.correct),0);
+
+  E('det-header').innerHTML=`<div style="display:flex;align-items:center;gap:.75rem">
+    <div class="av" style="width:42px;height:42px;font-size:1.1rem">${name[0]}</div>
+    <div><div style="font-size:1.2rem;font-weight:800">${name}</div><div style="font-size:.82rem;color:var(--mt)">${rs.length} اختبار مُكتمل</div></div>
+  </div>`;
+
+  E('det-metrics').innerHTML=`
+    <div class="metric"><div class="mn">${rs.length}</div><div class="ml">اختبارات</div></div>
+    <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط الدرجة</div></div>
+    <div class="metric"><div class="mn">${best}%</div><div class="ml">أعلى درجة</div></div>
+    <div class="metric"><div class="mn">${fmtD(avgD)}</div><div class="ml">متوسط الوقت</div></div>
+    <div class="metric"><div class="mn">${wrongs}</div><div class="ml">إجمالي الأخطاء</div></div>`;
+
+  // تبويبات المواد
+  const usedSubjs=['all',...new Set(rs.map(r=>r.subject))];
+  E('det-stabs').innerHTML=usedSubjs.map(k=>`<div class="det-stab${k==='all'?' on':''}" onclick="switchDetFilter('${k}',this)">
+    ${k==='all'?'🗂 الكل':((SUBJ[k]?.ic||'')+' '+(SUBJ[k]?.n||k))}
+  </div>`).join('');
+
+  renderDetTable(rs);
+  renderDetErrors(rs);
+  showPg('pg-detail');
+}
+
+function switchDetFilter(k,el){
+  document.querySelectorAll('.det-stab').forEach(t=>t.classList.remove('on'));
+  el.classList.add('on');
+  const rs=allResults.filter(r=>r.user_id===detUid&&(k==='all'||r.subject===k)).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
+  renderDetTable(rs);
+}
+
+function renderDetTable(rs){
+  E('det-table').innerHTML=rs.length?`<table>
+    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صحيح/خاطئ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
+    <tbody>${rs.map(r=>`<tr>
+      <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
+      <td>القسم ${r.section_num}</td>
+      <td>${bdg(r.score_pct)}</td>
+      <td><span style="color:var(--grd)">✅${r.correct}</span>/<span style="color:var(--rd)">❌${r.total-r.correct}</span></td>
+      <td style="font-size:.8rem">${fmtD(r.duration_sec)}</td>
+      <td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`:`<div class="empty-state"><div class="empty-desc">لا توجد نتائج في هذه المادة</div></div>`;
+}
+
+function renderDetErrors(rs){
+  if(!rs.length){E('det-err-card').style.display='none';return;}
+  E('det-err-card').style.display='';
+  const grp={};
+  rs.forEach(r=>{const k=r.subject+'|'+r.section_num;if(!grp[k])grp[k]={sub:r.subject,sec:r.section_num,w:0,t:0};grp[k].w+=r.total-r.correct;grp[k].t+=r.total;});
+  const sorted=Object.values(grp).filter(x=>x.w>0).sort((a,b)=>b.w/b.t-a.w/a.t).slice(0,6);
+  E('det-errors').innerHTML=sorted.length?sorted.map(x=>{
+    const pct=Math.round(x.w/x.t*100);
+    return `<div style="margin-bottom:.75rem">
+      <div style="display:flex;justify-content:space-between;font-size:.86rem;margin-bottom:3px">
+        <span>${SUBJ[x.sub]?.ic||''} ${SUBJ[x.sub]?.n||x.sub} — القسم ${x.sec}</span>
+        <span style="color:var(--rd)">${x.w} خطأ (${pct}%)</span>
+      </div>
+      <div class="pbar"><div class="pfill" style="width:${pct}%;background:var(--rd)"></div></div>
+    </div>`;
+  }).join(''):`<div class="empty-state" style="padding:1rem"><div class="empty-desc">لا توجد أخطاء متكررة</div></div>`;
+}
+
+function back(){showPg('pg-admin');aTab(prevAdminTab,['overview','students','upload','accounts','stats'].indexOf(prevAdminTab));}
+
+/* ─── UPLOAD ─── */
+function updateUploadStatus(){
+  ['kamy','gat','saat','tahsili'].forEach(k=>{
+    const cnt=allSections.filter(s=>s.subject===k).length;
+    const el=E('st-'+k);
+    if(cnt>0){el.className='status-pill s-ready';el.textContent=`✅ ${cnt} قسم`;}
+    else{el.className='status-pill s-empty';el.textContent='⬜ لا يوجد';}
+  });
+}
+function dzo(e,id){e.preventDefault();E(id).classList.add('drag');}
+function dzl(id){E(id).classList.remove('drag');}
+function dzd(e,subj){e.preventDefault();dzl('dz-'+subj);if(e.dataTransfer.files[0])processUp(e.dataTransfer.files[0],subj);}
+function handleUp(inp,subj){if(inp.files[0])processUp(inp.files[0],subj);}
+
+async function processUp(file,subj){
+  const log=E('log-'+subj), st=E('st-'+subj);
+  log.innerHTML=''; st.className='status-pill s-loading'; st.textContent='⏳ جارٍ المعالجة...';
+  addLog(log,'info',`📂 ${file.name} (${(file.size/1024).toFixed(0)}KB)`);
+  let total=0;
+  try{
+    if(file.name.endsWith('.zip')){
+      addLog(log,'info','📦 قراءة ملف ZIP...');
+      const ab=await file.arrayBuffer(); const b=new Uint8Array(ab); let c=0;
+      for(let i=0;i<b.length-4;i++) if(b[i]===0x50&&b[i+1]===0x4b&&b[i+2]===0x03&&b[i+3]===0x04) c++;
+      total=Math.max(c,1);
+      addLog(log,'ok',`✅ الكشف عن ${c} ملف في ZIP`);
+    } else if(file.name.endsWith('.html')){
+      addLog(log,'info','📄 قراءة ملف HTML...');
+      const txt=await file.text();
+      const m=txt.match(/sec_\d+\.html/g);
+      total=m?new Set(m).size:Math.round((txt.match(/ans:/g)||[]).length/11)||11;
+      addLog(log,'ok',`✅ الكشف عن ~${total} قسم`);
+    } else {
+      addLog(log,'info','📋 ملف PDF...');
+      total=90; addLog(log,'ok','✅ سيتم تسجيل 90 قسم افتراضياً');
+    }
+    addLog(log,'info',`⏳ تسجيل ${total} قسم في قاعدة البيانات...`);
+    const batch=Array.from({length:Math.min(total,99)},(_,i)=>({subject:subj,section_num:i+1,questions_count:11}));
+    let done=0;
+    for(let i=0;i<batch.length;i+=20){
+      try{await sb('POST','sections','',batch.slice(i,i+20));}catch(e){}
+      done+=Math.min(20,batch.length-i);
+    }
+    addLog(log,'ok',`✅ تم تسجيل ${done} قسم بنجاح`);
+    await refreshAdmin();
+  }catch(e){addLog(log,'err','❌ '+e.message);st.className='status-pill s-empty';st.textContent='❌ فشل';}
+}
+function addLog(el,type,msg){const d=document.createElement('div');d.className='log-'+type;d.textContent=msg;el.appendChild(d);el.scrollTop=el.scrollHeight;}
+
+/* ─── STUDENT ─── */
+async function loadStudent(){
+  showPg('pg-student');
+  E('stu-av').textContent=me.name[0];
+  E('stu-nm').textContent=me.name;
+  E('stu-hi').textContent='مرحباً، '+me.name+' 👋';
+  if(selectedSubj){var hf=document.getElementById('his-filter');if(hf)hf.value=selectedSubj;}
+  // تعيين الفلتر الافتراضي للمادة المختارة
+  if(selectedSubj){
+    const hf=document.getElementById('his-filter');
+    if(hf) hf.value=selectedSubj;
+  }
+  // خيارات الصحيح
+  const cor=E('r-cor'); cor.innerHTML='<option value="">من 11</option>';
+  for(let i=0;i<=11;i++) cor.innerHTML+=`<option value="${i}">${i} إجابة صحيحة</option>`;
+  await refreshStudent();
+}
+
+async function loadSections(){
+  const subj=V('r-subj');
+  const sel=E('r-sec');
+  sel.innerHTML='<option value="">جارٍ التحميل...</option>';
+  if(!subj){sel.innerHTML='<option value="">اختر المادة أولاً</option>';return;}
+  try{
+    const secs=await sb('GET','sections',`subject=eq.${subj}&order=section_num.asc&select=section_num`);
+    sel.innerHTML='<option value="">اختر القسم...</option>';
+    secs.forEach(s=>sel.innerHTML+=`<option value="${s.section_num}">القسم ${s.section_num}</option>`);
+    if(!secs.length) sel.innerHTML='<option value="">لا يوجد أقسام لهذه المادة</option>';
+  }catch(e){sel.innerHTML='<option value="">خطأ في التحميل</option>';}
+}
+
+async function refreshStudent(){
+  try{
+    myResults=await sb('GET','results',`user_id=eq.${me.id}&select=*&order=created_at.desc`);
+    const avg=myResults.length?Math.round(myResults.reduce((s,r)=>s+r.score_pct,0)/myResults.length):0;
+    const best=myResults.length?Math.max(...myResults.map(r=>r.score_pct)):0;
+    const done=new Set(myResults.map(r=>r.subject+'_'+r.section_num)).size;
+    const wrongs=myResults.reduce((s,r)=>s+(r.total-r.correct),0);
+
+    E('stu-metrics').innerHTML=`
+      <div class="metric"><div class="mn">${myResults.length}</div><div class="ml">اختبارات</div></div>
+      <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط درجاتي</div></div>
+      <div class="metric"><div class="mn">${best}%</div><div class="ml">أعلى درجة</div></div>
+      <div class="metric"><div class="mn">${done}</div><div class="ml">قسم أكملته</div></div>
+      <div class="metric"><div class="mn">${wrongs}</div><div class="ml">إجمالي أخطائي</div></div>`;
+
+    E('stu-subj').innerHTML=Object.entries(SUBJ).map(([k,s])=>{
+      const rs=myResults.filter(r=>r.subject===k);
+      const avg2=rs.length?Math.round(rs.reduce((a,r)=>a+r.score_pct,0)/rs.length):null;
+      return `<div class="subj-card ${s.cl}">
+        <span class="subj-icon">${s.ic}</span>
+        <div class="subj-name">${s.n}</div>
+        ${avg2!==null?`<div style="font-size:1.5rem;font-weight:800;background:linear-gradient(135deg,var(--pl),var(--tl));-webkit-background-clip:text;-webkit-text-fill-color:transparent">${avg2}%</div>
+        <div class="subj-meta">${rs.length} اختبار</div>`
+        :'<span class="status-pill s-empty">لم تبدأ بعد</span>'}
+      </div>`;
+    }).join('');
+
+    filterHistory();
+  }catch(e){console.error(e);}
+}
+
+function filterHistory(){
+  const f=V('his-filter')||'';
+  const rs=myResults.filter(r=>!f||r.subject===f);
+  E('stu-table').innerHTML=rs.length?`<table>
+    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صحيح/خاطئ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
+    <tbody>${rs.map(r=>`<tr>
+      <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
+      <td>القسم ${r.section_num}</td>
+      <td>${bdg(r.score_pct)}</td>
+      <td><span style="color:var(--grd)">✅${r.correct}</span>/<span style="color:var(--rd)">❌${r.total-r.correct}</span></td>
+      <td style="font-size:.8rem">${fmtD(r.duration_sec)}</td>
+      <td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
+    </tr>`).join('')}</tbody>
+  </table>`:`<div class="empty-state"><span class="empty-icon">📋</span><div class="empty-title">لا يوجد سجل بعد</div><div class="empty-desc">ابدأ اختباراً وسجّل نتيجتك هنا</div></div>`;
+}
+
+async function submitResult(){
+  const subj=V('r-subj'), sec=V('r-sec'), cor=V('r-cor');
+  const dur=parseInt(V('r-dur'))||0;
+  const msg=E('r-msg');
+  if(!subj||!sec||!cor){setTxt(msg,'اختر المادة والقسم وعدد الإجابات الصحيحة','rd');return;}
+  if(dur<1||dur>120){setTxt(msg,'أدخل وقتاً صحيحاً (1-120 دقيقة)','rd');return;}
+  const correct=parseInt(cor), pct=Math.round(correct/11*100);
+  const finalDur=timerRunning?timerSec:dur*60;
+  try{
+    await sb('POST','results','',[{user_id:me.id,subject:subj,section_num:parseInt(sec),correct,total:11,duration_sec:finalDur,score_pct:pct}]);
+    stopTimer();
+    setTxt(msg,`تم تسجيل ${SUBJ[subj]?.n} القسم ${sec} — ${correct}/11 (${pct}%) ✅`,'grd');
+    E('r-subj').value=''; E('r-sec').innerHTML='<option value="">اختر القسم...</option>';
+    E('r-cor').value=''; E('r-dur').value='';
+    await refreshStudent();
+  }catch(e){setTxt(msg,'خطأ: '+e.message,'rd');}
+}
+
+/* ─── TIMER ─── */
+function toggleTimer(){
+  if(timerRunning) stopTimer();
+  else startTimer();
+}
+function startTimer(){
+  timerRunning=true; timerSec=0;
+  E('timer-badge').style.display='flex';
+  E('timer-btn').textContent='⏹ إيقاف المؤقت';
+  timerInt=setInterval(()=>{
+    timerSec++;
+    const m=String(Math.floor(timerSec/60)).padStart(2,'0');
+    const s=String(timerSec%60).padStart(2,'0');
+    E('timer-badge').textContent=`⏱ ${m}:${s}`;
+  },1000);
+}
+function stopTimer(){
+  clearInterval(timerInt); timerRunning=false;
+  E('timer-badge').style.display='none';
+  E('timer-btn').textContent='⏱ بدء المؤقت';
+}
+
+/* ─── EXPORT ─── */
+function exportCSV(){
+  const hdr='الطالب,المادة,القسم,الدرجة,صحيح,خاطئ,الوقت,التاريخ';
+  const rows=allResults.map(r=>[
+    r.users?.name||'',SUBJ[r.subject]?.n||r.subject,r.section_num,
+    r.score_pct+'%',r.correct,r.total-r.correct,fmtD(r.duration_sec),fmtDate(r.created_at)
+  ].join(','));
+  const csv='\uFEFF'+hdr+'\n'+rows.join('\n');
+  const a=document.createElement('a');
+  a.href='data:text/csv;charset=utf-8,'+encodeURIComponent(csv);
+  a.download='qudorat_results_'+new Date().toISOString().slice(0,10)+'.csv';
+  a.click();
+}
+
+/* ─── HELPERS ─── */
+const E=id=>document.getElementById(id);
+const V=id=>E(id)?.value||'';
+function showPg(id){document.querySelectorAll('.pg').forEach(p=>p.classList.remove('on'));E(id).classList.add('on');scrollTo(0,0);}
+function showMsg(id,msg,type){const el=E(id);el.style.display='block';el.className='alert a-'+(type==='err'?'err':'ok');el.textContent=msg;}
+function setTxt(el,msg,color){el.style.color='var(--'+color+')';el.textContent=msg;setTimeout(()=>el.textContent='',5000);}
+function bdg(p){return p>=80?`<span class="bdg b-gr">${p}%</span>`:p>=50?`<span class="bdg b-yl">${p}%</span>`:`<span class="bdg b-rd">${p}%</span>`;}
+function fmtD(s){if(!s&&s!==0)return '—';const m=Math.floor(s/60),sc=s%60;return m+'د '+sc+'ث';}
+function fmtDate(ts){if(!ts)return '—';return new Date(ts).toLocaleDateString('ar-SA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
+function isToday(ts){const d=new Date(ts),n=new Date();return d.toDateString()===n.toDateString();}
+function cpEl(id,btn){navigator.clipboard.writeText(E(id).textContent).then(()=>{btn.textContent='✅ تم النسخ';setTimeout(()=>btn.textContent='📋 نسخ الكود',2000)});}
+
+/* ─── INIT ─── */
+window.onload=function(){
+  // المفاتيح مدمجة — انتقل مباشرة لصفحة الدخول
+  _sbClient=null;
+  var pages=document.querySelectorAll('.pg');
+  for(var i=0;i<pages.length;i++) pages[i].classList.remove('on');
+  var lp=document.getElementById('pg-login');
+  if(lp){ lp.classList.add('on'); }
+};
+</script>
+</body>
+</html>

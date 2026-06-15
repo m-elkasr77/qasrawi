@@ -200,8 +200,8 @@ const go=id=>{document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on
 
 function startQ(){
   _startTime=Date.now();
-  nm=document.getElementById('nm').value.trim()||'الطالب';
-  document.getElementById('sbar').textContent='👤 '+(_uname||nm||'الطالب');
+  var nm=_uname||'الطالب';
+  document.getElementById('sbar').textContent='👤 '+nm;
   c=0;sc=0;pk=false;log=[];
   go('s1');render();
 }

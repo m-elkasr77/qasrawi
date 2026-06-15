@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -63,7 +64,7 @@ tr:hover td{background:var(--s2)}
     <div style="font-size:.85rem;color:var(--mt);margin-top:.3rem;line-height:1.8">قدرات · GAT<br>تحصيلي · SAAT</div>
   </div>
 
-  <!-- اختيار المادة -->
+  <!-- Step 1: اختيار المادة -->
   <div id="step1">
     <div class="subj-grid">
       <div class="subj-card" onclick="pickSubj('kamy',this)"><span class="subj-icon">📐</span><div class="subj-name">قدرات كمي</div></div>
@@ -79,7 +80,7 @@ tr:hover td{background:var(--s2)}
     </div>
   </div>
 
-  <!-- تسجيل الدخول -->
+  <!-- Step 2: تسجيل الدخول -->
   <div id="step2" style="display:none">
     <div class="card">
       <div id="subj-badge" style="text-align:center;margin-bottom:.85rem"></div>
@@ -95,151 +96,136 @@ tr:hover td{background:var(--s2)}
 
 <!-- ══ ADMIN ══ -->
 <div class="pg" id="pg-admin">
-  <div class="topbar">
-    <div class="logo">🎓 القصراوي</div>
-    <div style="display:flex;gap:.5rem;align-items:center">
-      <div class="chip"><div class="av" id="adm-av">م</div><span id="adm-nm"></span></div>
-      <button class="btn bp btn-sm" onclick="logout()">خروج</button>
+<div class="topbar">
+  <div class="logo">🎓 القصراوي</div>
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <div class="chip"><div class="av" id="adm-av">م</div><span id="adm-nm"></span></div>
+    <button class="btn bp btn-sm" onclick="logout()">خروج</button>
+  </div>
+</div>
+<div class="wrap" style="padding:1.2rem 1rem">
+  <div class="tabs">
+    <div class="tab on" onclick="aTab(0,this)">📊 نظرة عامة</div>
+    <div class="tab" onclick="aTab(1,this)">👥 الطلاب</div>
+    <div class="tab" onclick="aTab(2,this)">⚙️ الحسابات</div>
+    <div class="tab" onclick="aTab(3,this)">📈 إحصائيات</div>
+  </div>
+
+  <!-- نظرة عامة -->
+  <div id="at0">
+    <div class="metrics" id="adm-m"></div>
+    <div class="card">
+      <div style="font-size:.95rem;font-weight:700;margin-bottom:.8rem">📋 آخر نشاط</div>
+      <div id="adm-act"></div>
     </div>
   </div>
-  <div class="wrap" style="padding:1.2rem 1rem">
-    <div class="tabs">
-      <div class="tab on" onclick="aTab(0,this)">📊 نظرة عامة</div>
-      <div class="tab" onclick="aTab(1,this)">👥 الطلاب</div>
-      <div class="tab" onclick="aTab(2,this)">⚙️ الحسابات</div>
-      <div class="tab" onclick="aTab(3,this)">📈 إحصائيات</div>
-    </div>
 
-    <!-- نظرة عامة -->
-    <div id="at0">
-      <div class="metrics" id="adm-m"></div>
+  <!-- الطلاب -->
+  <div id="at1" style="display:none">
+    <div style="display:flex;gap:.6rem;margin-bottom:.8rem;flex-wrap:wrap">
+      <input class="inp" id="sq" placeholder="🔍 بحث..." oninput="renderStudents()" style="max-width:220px">
+      <select class="inp" id="sf" onchange="renderStudents()" style="max-width:180px;cursor:pointer">
+        <option value="">كل الطلاب</option>
+        <option value="high">متفوق ≥80%</option>
+        <option value="low">يحتاج دعم <50%</option>
+      </select>
+    </div>
+    <div class="card" style="padding:.5rem">
+      <div class="tbl"><table>
+        <thead><tr><th>الطالب</th><th>اختبارات</th><th>متوسط</th><th>إجمالي الوقت</th><th>آخر نشاط</th><th></th></tr></thead>
+        <tbody id="stbl"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- الحسابات -->
+  <div id="at2" style="display:none">
+    <div class="card">
+      <div style="font-size:.95rem;font-weight:700;margin-bottom:.8rem">➕ إضافة طالب</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:.7rem">
+        <div><label class="lbl">الاسم</label><input class="inp" id="nn" placeholder="الاسم الكامل"></div>
+        <div><label class="lbl">المستخدم</label><input class="inp" id="nu" placeholder="username"></div>
+        <div><label class="lbl">كلمة المرور</label><input class="inp" id="np" type="password" placeholder="password"></div>
+      </div>
+      <div id="add-msg" style="font-size:.85rem;min-height:1.1rem;margin-bottom:.3rem"></div>
+      <button class="btn bp" style="width:auto;padding:.6rem 1.3rem" onclick="addStudent()">✅ إضافة</button>
+    </div>
+    <div class="card" style="padding:.5rem">
+      <div class="tbl"><table>
+        <thead><tr><th>الاسم</th><th>المستخدم</th><th>اختبارات</th><th>آخر دخول</th><th>حذف</th></tr></thead>
+        <tbody id="mtbl"></tbody>
+      </table></div>
+    </div>
+  </div>
+
+  <!-- إحصائيات -->
+  <div id="at3" style="display:none">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
       <div class="card">
-        <div style="font-size:.95rem;font-weight:700;margin-bottom:.8rem">📋 آخر نشاط</div>
-        <div id="adm-act"></div>
+        <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">🏆 أفضل الطلاب</div>
+        <div class="tbl"><table><thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead><tbody id="top-tbl"></tbody></table></div>
       </div>
-    </div>
-
-    <!-- الطلاب -->
-    <div id="at1" style="display:none">
-      <div style="display:flex;gap:.6rem;margin-bottom:.8rem;flex-wrap:wrap">
-        <input class="inp" id="sq" placeholder="🔍 بحث..." oninput="renderStudents()" style="max-width:220px">
-        <select class="inp" id="sf" onchange="renderStudents()" style="max-width:180px;cursor:pointer">
-          <option value="">كل الطلاب</option>
-          <option value="high">متفوق ≥80%</option>
-          <option value="low">يحتاج دعم &lt;50%</option>
-        </select>
-      </div>
-      <div class="card" style="padding:.5rem">
-        <div class="tbl"><table>
-          <thead><tr><th>الطالب</th><th>اختبارات</th><th>متوسط</th><th>آخر نشاط</th><th></th></tr></thead>
-          <tbody id="stbl"></tbody>
-        </table></div>
-      </div>
-    </div>
-
-    <!-- الحسابات -->
-    <div id="at2" style="display:none">
       <div class="card">
-        <div style="font-size:.95rem;font-weight:700;margin-bottom:.8rem">➕ إضافة طالب</div>
-        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:.7rem;margin-bottom:.7rem">
-          <div><label class="lbl">الاسم</label><input class="inp" id="nn" placeholder="الاسم الكامل"></div>
-          <div><label class="lbl">المستخدم</label><input class="inp" id="nu" placeholder="username"></div>
-          <div><label class="lbl">كلمة المرور</label><input class="inp" id="np" type="password" placeholder="password"></div>
-        </div>
-        <div id="add-msg" style="font-size:.85rem;min-height:1.1rem;margin-bottom:.3rem"></div>
-        <button class="btn bp" style="width:auto;padding:.6rem 1.3rem" onclick="addStudent()">✅ إضافة</button>
-      </div>
-      <div class="card" style="padding:.5rem">
-        <div class="tbl"><table>
-          <thead><tr><th>الاسم</th><th>المستخدم</th><th>اختبارات</th><th>آخر دخول</th><th>حذف</th></tr></thead>
-          <tbody id="mtbl"></tbody>
-        </table></div>
-      </div>
-    </div>
-
-    <!-- إحصائيات -->
-    <div id="at3" style="display:none">
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1rem">
-        <div class="card">
-          <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">🏆 أفضل الطلاب</div>
-          <div class="tbl"><table><thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead><tbody id="top-tbl"></tbody></table></div>
-        </div>
-        <div class="card">
-          <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">⚠️ يحتاجون دعماً</div>
-          <div class="tbl"><table><thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead><tbody id="weak-tbl"></tbody></table></div>
-        </div>
+        <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">⚠️ يحتاجون دعماً</div>
+        <div class="tbl"><table><thead><tr><th>الطالب</th><th>متوسط</th><th>اختبارات</th></tr></thead><tbody id="weak-tbl"></tbody></table></div>
       </div>
     </div>
   </div>
+</div>
 </div>
 
 <!-- ══ STUDENT DETAIL ══ -->
 <div class="pg" id="pg-det">
-  <div class="topbar">
-    <div class="logo">🎓 القصراوي</div>
-    <button class="btn bg2 btn-sm" onclick="showPg('pg-admin')">← رجوع</button>
+<div class="topbar">
+  <div class="logo">🎓 القصراوي</div>
+  <button class="btn bg2 btn-sm" onclick="showPg('pg-admin')">← رجوع</button>
+</div>
+<div class="wrap" style="padding:1.2rem 1rem">
+  <div id="det-hdr" style="margin-bottom:1rem"></div>
+  <div class="metrics" id="det-m"></div>
+  <div class="card">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">📝 سجل الاختبارات</div>
+    <div class="tbl" id="det-tbl"></div>
   </div>
-  <div class="wrap" style="padding:1.2rem 1rem">
-    <div id="det-hdr" style="margin-bottom:1rem"></div>
-    <div class="metrics" id="det-m"></div>
-    <div class="card">
-      <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">📝 سجل الاختبارات</div>
-      <div class="tbl" id="det-tbl"></div>
-    </div>
-  </div>
+</div>
 </div>
 
 <!-- ══ STUDENT ══ -->
 <div class="pg" id="pg-stu">
-  <div class="topbar">
-    <div class="logo">🎓 القصراوي</div>
-    <div style="display:flex;gap:.5rem;align-items:center">
-      <div class="chip"><div class="av" id="stu-av">ط</div><span id="stu-nm"></span></div>
-      <button class="btn bp btn-sm" onclick="logout()">خروج</button>
-    </div>
+<div class="topbar">
+  <div class="logo">🎓 القصراوي</div>
+  <div style="display:flex;gap:.5rem;align-items:center">
+    <div class="chip"><div class="av" id="stu-av">ط</div><span id="stu-nm"></span></div>
+    <button class="btn bp btn-sm" onclick="logout()">خروج</button>
   </div>
-  <div class="wrap" style="padding:1.2rem 1rem">
-    <div style="font-size:1.2rem;font-weight:800;margin-bottom:.3rem" id="stu-hi"></div>
-    <div style="font-size:.83rem;color:var(--mt);margin-bottom:1rem">لوحة اختباراتي</div>
-    <div class="metrics" id="stu-m"></div>
-    <div class="card">
-      <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">📊 اختباراتي</div>
-      <div class="tbl" id="stu-tbl"></div>
-    </div>
-    <!-- روابط الأقسام -->
-    <div class="card" style="border:1px solid var(--bd);margin-bottom:1rem">
-      <div style="font-size:.9rem;font-weight:700;margin-bottom:.85rem">📚 ابدأ قسماً جديداً</div>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem" id="sec-links">
-        <div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">جارٍ تحميل الأقسام...</div>
-      </div>
-    </div>
+</div>
+<div class="wrap" style="padding:1.2rem 1rem">
+  <div style="font-size:1.2rem;font-weight:800;margin-bottom:.3rem" id="stu-hi"></div>
+  <div style="font-size:.83rem;color:var(--mt);margin-bottom:1rem">لوحة اختباراتي</div>
+  <div class="metrics" id="stu-m"></div>
 
-    <!-- تسجيل نتيجة -->
-    <div class="card" style="border:1px solid var(--p)">
-      <div style="font-size:.9rem;font-weight:700;color:var(--pl);margin-bottom:.5rem">📥 تسجيل نتيجة اختبار</div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:.6rem;margin-bottom:.6rem">
-        <div><label class="lbl">المادة</label>
-          <select class="inp" id="r-subj" onchange="loadSecs()" style="cursor:pointer">
-            <option value="">اختر...</option>
-            <option value="kamy">📐 قدرات كمي</option>
-            <option value="gat">🎯 GAT</option>
-            <option value="tahsili">📚 تحصيلي</option>
-            <option value="saat">⚡ SAAT</option>
-          </select></div>
-        <div><label class="lbl">القسم</label>
-          <select class="inp" id="r-sec" style="cursor:pointer"><option value="">اختر...</option></select></div>
-        <div><label class="lbl">الصحيح</label>
-          <select class="inp" id="r-cor" style="cursor:pointer">
-            <option value="">من 11</option>
-            <option value="0">0</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option>
-          </select></div>
-        <div><label class="lbl">الوقت (دقيقة)</label>
-          <input class="inp" id="r-dur" type="number" min="1" max="120" placeholder="مثال: 8"></div>
-      </div>
-      <div id="r-msg" style="font-size:.85rem;min-height:1.1rem;margin-bottom:.4rem"></div>
-      <button class="btn bp" style="width:auto;padding:.6rem 1.3rem" onclick="submitRes()">💾 تسجيل</button>
+  <!-- إحصائيات الوقت -->
+  <div class="card" style="margin-bottom:1rem">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:.7rem">⏱ إحصائيات الوقت</div>
+    <div class="metrics" id="stu-time-m"></div>
+  </div>
+
+  <div class="card">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:.8rem">📊 اختباراتي</div>
+    <div class="tbl" id="stu-tbl"></div>
+  </div>
+
+  <!-- روابط الأقسام -->
+  <div class="card" style="border:1px solid var(--bd);margin-bottom:1rem">
+    <div style="font-size:.9rem;font-weight:700;margin-bottom:.85rem">📚 ابدأ قسماً جديداً</div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:.7rem" id="sec-links">
+      <div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">جارٍ تحميل الأقسام...</div>
+    </div>
+    <div style="text-align:center;margin-top:.8rem">
+      <a href="index.html" style="color:var(--pl);font-size:.85rem;font-weight:700;text-decoration:none">← عرض كل الأقسام</a>
     </div>
   </div>
+</div>
 </div>
 
 <script>
@@ -269,7 +255,7 @@ function pickSubj(s,el){
   document.getElementById('subj-err').textContent='';
 }
 function toStep2(skip){
-  if(!skip && !selSubj){document.getElementById('subj-err').textContent='اختر مادة أولاً';return;}
+  if(!skip&&!selSubj){document.getElementById('subj-err').textContent='اختر مادة أولاً';return;}
   const nb=SUBJ[selSubj];
   document.getElementById('subj-badge').innerHTML=nb?
     `<div style="display:inline-flex;align-items:center;gap:6px;background:linear-gradient(135deg,var(--p),var(--t));color:#fff;padding:.3rem .9rem;border-radius:99px;font-size:.85rem;font-weight:700">${nb.ic} ${nb.n}</div>`:'';
@@ -295,17 +281,29 @@ async function doLogin(){
     if(error) throw new Error(error.message);
     if(!data||!data.length){showErr('li-err','اسم المستخدم أو كلمة المرور غير صحيحة');return;}
     me=data[0];
-    // حفظ بيانات الطالب في localStorage للاستخدام في ملفات الأقسام
-    localStorage.setItem('qk_uid', me.id);
+    // ── حفظ بيانات الطالب (localStorage + sessionStorage) ──
+    localStorage.setItem('qk_uid',  me.id);
     localStorage.setItem('qk_name', me.name);
     localStorage.setItem('qk_subj', selSubj||'kamy');
+    sessionStorage.setItem('qk_uid',  me.id);
+    sessionStorage.setItem('qk_name', me.name);
+    sessionStorage.setItem('qk_subj', selSubj||'kamy');
     document.getElementById('li-err').style.display='none';
     if(me.role==='admin') await loadAdmin();
     else await loadStudent();
   }catch(e){showErr('li-err','خطأ: '+e.message);}
   finally{btn.textContent='🔐 دخول';btn.disabled=false;}
 }
-function logout(){me=null;selSubj='';localStorage.removeItem('qk_uid');localStorage.removeItem('qk_name');localStorage.removeItem('qk_subj');document.getElementById('step1').style.display='block';document.getElementById('step2').style.display='none';document.querySelectorAll('.subj-card').forEach(c=>c.classList.remove('on'));showPg('pg-login');}
+
+function logout(){
+  me=null; selSubj='';
+  localStorage.removeItem('qk_uid'); localStorage.removeItem('qk_name'); localStorage.removeItem('qk_subj');
+  sessionStorage.removeItem('qk_uid'); sessionStorage.removeItem('qk_name'); sessionStorage.removeItem('qk_subj');
+  document.getElementById('step1').style.display='block';
+  document.getElementById('step2').style.display='none';
+  document.querySelectorAll('.subj-card').forEach(c=>c.classList.remove('on'));
+  showPg('pg-login');
+}
 
 // ══ ADMIN ══
 async function loadAdmin(){
@@ -326,14 +324,17 @@ function aTab(idx,el){
   document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('on',i===idx));
   [0,1,2,3].forEach(i=>document.getElementById('at'+i).style.display=i===idx?'':'none');
 }
+
 function renderOverview(){
   const avg=results.length?Math.round(results.reduce((s,r)=>s+r.score_pct,0)/results.length):0;
   const today=new Set(results.filter(r=>isToday(r.created_at)).map(r=>r.user_id)).size;
+  const totalMin=Math.round(results.reduce((s,r)=>s+(r.duration_sec||0),0)/60);
   document.getElementById('adm-m').innerHTML=`
     <div class="metric"><div class="mn">${students.length}</div><div class="ml">الطلاب</div></div>
     <div class="metric"><div class="mn">${results.length}</div><div class="ml">اختبارات</div></div>
     <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط</div></div>
-    <div class="metric"><div class="mn">${today}</div><div class="ml">نشط اليوم</div></div>`;
+    <div class="metric"><div class="mn">${today}</div><div class="ml">نشط اليوم</div></div>
+    <div class="metric"><div class="mn">${totalMin}د</div><div class="ml">إجمالي الوقت</div></div>`;
   const last=results.slice(0,10);
   document.getElementById('adm-act').innerHTML=last.length?`<div class="tbl"><table>
     <thead><tr><th>الطالب</th><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
@@ -342,10 +343,12 @@ function renderOverview(){
       <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
       <td>${r.section_num}</td><td>${bdg(r.score_pct)}</td>
       <td><span style="color:var(--gr)">✅${r.correct}</span>/<span style="color:var(--rd)">❌${r.total-r.correct}</span></td>
-      <td>${fmtD(r.duration_sec)}</td><td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
+      <td>${fmtD(r.duration_sec)}</td>
+      <td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
     </tr>`).join('')}</tbody>
   </table></div>`:'<div style="text-align:center;padding:1.5rem;color:var(--mt)">لا يوجد نشاط بعد</div>';
 }
+
 function renderStudents(){
   const q=(document.getElementById('sq').value||'').toLowerCase();
   const f=document.getElementById('sf').value;
@@ -360,16 +363,19 @@ function renderStudents(){
   document.getElementById('stbl').innerHTML=list.length?list.map(u=>{
     const rs=results.filter(r=>r.user_id===u.id);
     const avg=rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):null;
+    const totalSec=rs.reduce((s,r)=>s+(r.duration_sec||0),0);
     const last=rs[0]?.created_at;
     return `<tr>
       <td><div style="display:flex;align-items:center;gap:.4rem"><div class="av" style="width:25px;height:25px;font-size:.7rem">${u.name[0]}</div>${u.name}</div></td>
       <td>${rs.length}</td>
       <td>${avg!==null?bdg(avg):'—'}</td>
+      <td>${totalSec?fmtD(totalSec):'—'}</td>
       <td style="font-size:.79rem;color:var(--mt)">${last?fmtDate(last):'—'}</td>
       <td><button class="btn bg2 btn-sm" onclick="showDet('${u.id}','${u.name}')">👁 تفاصيل</button></td>
     </tr>`;
-  }).join(''):'<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--mt)">لا توجد نتائج</td></tr>';
+  }).join(''):'<tr><td colspan="6" style="text-align:center;padding:1rem;color:var(--mt)">لا توجد نتائج</td></tr>';
 }
+
 function renderMgmt(){
   document.getElementById('mtbl').innerHTML=students.length?students.map(u=>{
     const last=results.filter(r=>r.user_id===u.id)[0]?.created_at;
@@ -382,12 +388,14 @@ function renderMgmt(){
     </tr>`;
   }).join(''):'<tr><td colspan="5" style="text-align:center;padding:1rem;color:var(--mt)">لا يوجد طلاب</td></tr>';
 }
+
 function renderStats(){
   const tops=students.map(u=>{const rs=results.filter(r=>r.user_id===u.id);return{...u,avg:rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):0,cnt:rs.length};}).filter(u=>u.cnt>0).sort((a,b)=>b.avg-a.avg).slice(0,5);
   document.getElementById('top-tbl').innerHTML=tops.length?tops.map((u,i)=>`<tr><td>${['🥇','🥈','🥉','4️⃣','5️⃣'][i]} ${u.name}</td><td>${bdg(u.avg)}</td><td>${u.cnt}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--mt);padding:.8rem">لا يوجد</td></tr>';
   const weak=students.map(u=>{const rs=results.filter(r=>r.user_id===u.id);return{...u,avg:rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):null,cnt:rs.length};}).filter(u=>u.avg!==null&&u.avg<50).sort((a,b)=>a.avg-b.avg).slice(0,5);
   document.getElementById('weak-tbl').innerHTML=weak.length?weak.map(u=>`<tr><td>${u.name}</td><td>${bdg(u.avg)}</td><td>${u.cnt}</td></tr>`).join(''):'<tr><td colspan="3" style="text-align:center;color:var(--mt);padding:.8rem">لا يوجد</td></tr>';
 }
+
 async function addStudent(){
   const name=document.getElementById('nn').value.trim();
   const user=document.getElementById('nu').value.trim();
@@ -403,23 +411,27 @@ async function addStudent(){
   }catch(e){msg.style.color='var(--rd)';msg.textContent='خطأ: '+e.message;}
   setTimeout(()=>msg.textContent='',3000);
 }
+
 async function delStu(id,name){
   if(!confirm('حذف '+name+'؟')) return;
   await DB().from('results').delete().eq('user_id',id);
   await DB().from('users').delete().eq('id',id);
   await refreshAdmin();
 }
+
 function showDet(uid,name){
   const rs=results.filter(r=>r.user_id===uid).sort((a,b)=>new Date(b.created_at)-new Date(a.created_at));
   const avg=rs.length?Math.round(rs.reduce((s,r)=>s+r.score_pct,0)/rs.length):0;
   const best=rs.length?Math.max(...rs.map(r=>r.score_pct)):0;
-  const avgD=rs.length?Math.round(rs.reduce((s,r)=>s+r.duration_sec,0)/rs.length):0;
+  const totalSec=rs.reduce((s,r)=>s+(r.duration_sec||0),0);
+  const avgD=rs.length?Math.round(totalSec/rs.length):0;
   document.getElementById('det-hdr').innerHTML=`<div style="display:flex;align-items:center;gap:.75rem"><div class="av" style="width:40px;height:40px;font-size:1rem">${name[0]}</div><div><div style="font-size:1.2rem;font-weight:800">${name}</div><div style="font-size:.82rem;color:var(--mt)">${rs.length} اختبار</div></div></div>`;
   document.getElementById('det-m').innerHTML=`
     <div class="metric"><div class="mn">${rs.length}</div><div class="ml">اختبارات</div></div>
     <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط</div></div>
     <div class="metric"><div class="mn">${best}%</div><div class="ml">أعلى درجة</div></div>
-    <div class="metric"><div class="mn">${fmtD(avgD)}</div><div class="ml">متوسط الوقت</div></div>`;
+    <div class="metric"><div class="mn">${fmtD(avgD)}</div><div class="ml">متوسط الوقت</div></div>
+    <div class="metric"><div class="mn">${fmtD(totalSec)}</div><div class="ml">إجمالي الوقت</div></div>`;
   document.getElementById('det-tbl').innerHTML=rs.length?`<table>
     <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
     <tbody>${rs.map(r=>`<tr>
@@ -439,42 +451,29 @@ async function loadStudent(){
   document.getElementById('stu-av').textContent=me.name[0];
   document.getElementById('stu-nm').textContent=me.name;
   document.getElementById('stu-hi').textContent='مرحباً، '+me.name+' 👋';
-  // فلتر المادة المختارة
-  if(selSubj){const sf=document.getElementById('his-filter');if(sf)sf.value=selSubj;}
   await refreshStudent();
   loadSecLinks();
 }
-async function loadSecLinks(){
-  const subj = selSubj || localStorage.getItem('qk_subj') || 'kamy';
-  try{
-    const {data} = await DB().from('sections').select('section_num').eq('subject', subj).order('section_num',{ascending:true});
-    const secs = data || [];
-    const SUBJ_NAMES = {kamy:'قدرات كمي',gat:'GAT',tahsili:'تحصيلي',saat:'SAAT'};
-    const BASE = 'https://m-elkasr77.github.io/qasrawi/';
-    const container = document.getElementById('sec-links');
-    if(!secs.length){
-      container.innerHTML='<div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">لا يوجد أقسام لهذه المادة</div>';
-      return;
-    }
-    container.innerHTML = secs.map(s=>`
-      <a href="${BASE}sec_${String(s.section_num).padStart(2,'0')}.html" 
-         style="background:var(--s2);border:1.5px solid var(--bd);border-radius:12px;padding:.85rem;text-align:center;text-decoration:none;display:block;transition:.18s"
-         onmouseover="this.style.borderColor='var(--pl)'" onmouseout="this.style.borderColor='var(--bd)'">
-        <div style="font-size:1.1rem;font-weight:800;color:var(--tx)">القسم ${s.section_num}</div>
-        <div style="font-size:.75rem;color:var(--mt);margin-top:.25rem">${SUBJ_NAMES[subj]||subj}</div>
-      </a>`).join('');
-  }catch(e){console.error(e);}
-}
+
 async function refreshStudent(){
   const {data}=await DB().from('results').select('*').eq('user_id',me.id).order('created_at',{ascending:false});
   myResults=data||[];
   const avg=myResults.length?Math.round(myResults.reduce((s,r)=>s+r.score_pct,0)/myResults.length):0;
   const best=myResults.length?Math.max(...myResults.map(r=>r.score_pct)):0;
+  const totalSec=myResults.reduce((s,r)=>s+(r.duration_sec||0),0);
+  const avgSec=myResults.length?Math.round(totalSec/myResults.length):0;
+
   document.getElementById('stu-m').innerHTML=`
     <div class="metric"><div class="mn">${myResults.length}</div><div class="ml">اختبارات</div></div>
     <div class="metric"><div class="mn">${avg}%</div><div class="ml">متوسط</div></div>
     <div class="metric"><div class="mn">${best}%</div><div class="ml">أعلى درجة</div></div>
     <div class="metric"><div class="mn">${new Set(myResults.map(r=>r.subject+'_'+r.section_num)).size}</div><div class="ml">قسم أكملته</div></div>`;
+
+  document.getElementById('stu-time-m').innerHTML=`
+    <div class="metric"><div class="mn">${fmtD(totalSec)}</div><div class="ml">إجمالي الوقت</div></div>
+    <div class="metric"><div class="mn">${fmtD(avgSec)}</div><div class="ml">متوسط الوقت/قسم</div></div>
+    <div class="metric"><div class="mn">${myResults.filter(r=>isToday(r.created_at)).length}</div><div class="ml">اختبارات اليوم</div></div>`;
+
   document.getElementById('stu-tbl').innerHTML=myResults.length?`<table>
     <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
     <tbody>${myResults.map(r=>`<tr>
@@ -486,40 +485,35 @@ async function refreshStudent(){
     </tr>`).join('')}</tbody>
   </table>`:'<div style="text-align:center;padding:1.5rem;color:var(--mt)">لم تُجرِ أي اختبار بعد</div>';
 }
-async function loadSecs(){
-  const subj=document.getElementById('r-subj').value;
-  const sel=document.getElementById('r-sec');
-  sel.innerHTML='<option value="">جارٍ التحميل...</option>';
-  if(!subj){sel.innerHTML='<option value="">اختر المادة أولاً</option>';return;}
-  const {data}=await DB().from('sections').select('section_num').eq('subject',subj).order('section_num',{ascending:true});
-  sel.innerHTML='<option value="">اختر القسم...</option>';
-  (data||[]).forEach(s=>sel.innerHTML+=`<option value="${s.section_num}">القسم ${s.section_num}</option>`);
-  if(!data?.length) sel.innerHTML='<option value="">لا يوجد أقسام</option>';
-}
-async function submitRes(){
-  const subj=document.getElementById('r-subj').value;
-  const sec=document.getElementById('r-sec').value;
-  const cor=document.getElementById('r-cor').value;
-  const dur=parseInt(document.getElementById('r-dur').value)||0;
-  const msg=document.getElementById('r-msg');
-  if(!subj||!sec||!cor){msg.style.color='var(--rd)';msg.textContent='أدخل جميع الحقول';return;}
-  if(dur<1||dur>120){msg.style.color='var(--rd)';msg.textContent='الوقت غير صحيح';return;}
-  const correct=parseInt(cor), pct=Math.round(correct/11*100);
+
+async function loadSecLinks(){
+  const subj=selSubj||localStorage.getItem('qk_subj')||'kamy';
   try{
-    const {error}=await DB().from('results').insert([{user_id:me.id,subject:subj,section_num:parseInt(sec),correct,total:11,duration_sec:dur*60,score_pct:pct}]);
-    if(error) throw new Error(error.message);
-    msg.style.color='var(--gr)';msg.textContent=`تم تسجيل القسم ${sec} — ${correct}/11 (${pct}%) ✅`;
-    document.getElementById('r-subj').value='';document.getElementById('r-sec').innerHTML='<option value="">اختر...</option>';
-    document.getElementById('r-cor').value='';document.getElementById('r-dur').value='';
-    await refreshStudent();
-  }catch(e){msg.style.color='var(--rd)';msg.textContent='خطأ: '+e.message;}
-  setTimeout(()=>msg.textContent='',5000);
+    const {data}=await DB().from('sections').select('section_num').eq('subject',subj).order('section_num',{ascending:true});
+    const secs=data||[];
+    const BASE='index.html';
+    const container=document.getElementById('sec-links');
+    if(!secs.length){container.innerHTML='<div style="text-align:center;color:var(--mt);font-size:.85rem;padding:1rem">لا يوجد أقسام</div>';return;}
+    const SUBJ_NAMES={kamy:'قدرات كمي',gat:'GAT',tahsili:'تحصيلي',saat:'SAAT'};
+    // الأقسام المنجزة
+    const doneSet=new Set(myResults.filter(r=>r.subject===subj).map(r=>r.section_num));
+    container.innerHTML=secs.map(s=>{
+      const isDone=doneSet.has(s.section_num);
+      return `<a href="sec_${String(s.section_num).padStart(2,'0')}.html"
+        style="background:var(--s2);border:1.5px solid ${isDone?'rgba(34,197,94,.4)':'var(--bd)'};border-radius:12px;padding:.85rem;text-align:center;text-decoration:none;display:block;transition:.18s;position:relative"
+        onmouseover="this.style.borderColor='var(--pl)'" onmouseout="this.style.borderColor='${isDone?'rgba(34,197,94,.4)':'var(--bd)'}'">
+        ${isDone?'<div style="position:absolute;top:.4rem;left:.5rem;font-size:.75rem">✅</div>':''}
+        <div style="font-size:1.1rem;font-weight:800;color:var(--tx)">القسم ${s.section_num}</div>
+        <div style="font-size:.75rem;color:var(--mt);margin-top:.25rem">${SUBJ_NAMES[subj]||subj}</div>
+      </a>`;
+    }).join('');
+  }catch(e){console.error(e);}
 }
 
 // ══ HELPERS ══
 function showErr(id,msg){const el=document.getElementById(id);el.style.display='block';el.textContent=msg;}
 function bdg(p){return p>=80?`<span class="bdg b-gr">${p}%</span>`:p>=50?`<span class="bdg b-yl">${p}%</span>`:`<span class="bdg b-rd">${p}%</span>`;}
-function fmtD(s){if(!s&&s!==0)return '—';return Math.floor(s/60)+'د '+s%60+'ث';}
+function fmtD(s){if(!s&&s!==0)return '—';const m=Math.floor(s/60);const sec=s%60;return m>0?`${m}د ${sec}ث`:`${sec}ث`;}
 function fmtDate(ts){if(!ts)return '—';return new Date(ts).toLocaleDateString('ar-SA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function isToday(ts){const d=new Date(ts),n=new Date();return d.toDateString()===n.toDateString();}
 </script>

@@ -87,15 +87,21 @@ h1{font-size:1.7rem;font-weight:800;text-align:center}
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const _SB=supabase.createClient('https://fnzzdracebdkcvtigris.supabase.co','sb_publishable_BPccEAh0KTTn4YMnNDL_JQ_GMlW3vr1');
-let _startTime=Date.now();
-// جلب بيانات الطالب من localStorage
+let _startTime=null;
 const _uid=localStorage.getItem('qk_uid')||'';
 const _uname=localStorage.getItem('qk_name')||'';
-async function _save(sec,subj,correct,total,dur,pct){
-  if(!_uid)return;
-  try{await _SB.from('results').insert([{user_id:_uid,subject:subj,section_num:sec,correct,total,duration_sec:dur,score_pct:pct}]);}
-  catch(e){console.error(e);}
-}
+const _subj=localStorage.getItem('qk_subj')||'kamy';
+window.addEventListener('DOMContentLoaded',function(){
+  var chip=document.getElementById('user-chip');
+  var warn=document.getElementById('guest-warn');
+  if(_uid&&_uname){
+    if(chip){chip.style.display='inline-flex';document.getElementById('uchip-av').textContent=_uname[0];document.getElementById('uchip-nm').textContent=_uname;}
+    if(warn)warn.style.display='none';
+  }else{
+    if(chip)chip.style.display='none';
+    if(warn)warn.style.display='block';
+  }
+});
 </script>
 </head>
 <body>
@@ -115,11 +121,13 @@ async function _save(sec,subj,correct,total,dur,pct){
     <div class="ib"><div class="n">٤</div><div class="l">خيارات</div></div>
     <div class="ib"><div class="n">&#9889;</div><div class="l">بلا توقيت</div></div>
   </div>
-  <div class="name-wrap">
-    <label class="name-label" for="nm">&#128100; اسم الطالب</label>
-    <input class="name-inp" id="nm" type="text" placeholder="اكتب اسمك هنا..." maxlength="40"
-      onkeydown="if(event.key==='Enter')startQ()">
-  </div>
+  <div id="user-chip" style="display:none;align-items:center;gap:.5rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);border-radius:99px;padding:.28rem .85rem .28rem .45rem;font-size:.82rem;font-weight:700;margin-bottom:.8rem">
+<div id="uchip-av" style="width:26px;height:26px;border-radius:50%;background:linear-gradient(135deg,#7c3aed,#06b6d4);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:800;color:#fff;flex-shrink:0"></div>
+<span id="uchip-nm"></span>
+</div>
+<div id="guest-warn" style="display:none;background:#2a1e00;border:1px solid #f59e0b;color:#f59e0b;border-radius:10px;padding:.5rem .9rem;font-size:.82rem;margin-bottom:.8rem;text-align:center">
+⚠️ أنت ضيف — <a href="qudorat_platform.html" style="color:inherit;font-weight:700">سجّل دخولك</a> لتُحفظ نتائجك
+</div>
   <button class="btn bp" onclick="startQ()">ابدأ القسم &#8592;</button>
 </div>
 </div>
@@ -158,7 +166,8 @@ async function _save(sec,subj,correct,total,dur,pct){
     <div class="sb st"><div class="n" id="rtl">0</div><div class="l">المجموع</div></div>
   </div>
   <p class="vd" id="rv"></p>
-  <button class="btn bp" onclick="rst()">&#128260; إعادة الاختبار</button>
+  <div id="save-msg" style="display:none;padding:.5rem .8rem;border-radius:10px;text-align:center;font-size:.85rem;font-weight:700;margin:.5rem 0"></div>
+<button class="btn bp" onclick="rst()">&#128260; إعادة الاختبار</button>
   <a class="btn bg" style="text-decoration:none;display:block;text-align:center;margin-top:.6rem" href="sec_17.html">القسم التالي &#8592;</a>
   <button class="btn bg" onclick="location.href='index.html'">&#127968; الرئيسية</button>
   <div class="rev-title">&#128269; مراجعة الأسئلة</div>
@@ -190,8 +199,9 @@ let c=0,sc=0,pk=false,nm='',log=[];
 const go=id=>{document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));document.getElementById(id).classList.add('on');scrollTo(0,0)};
 
 function startQ(){
+  _startTime=Date.now();
   nm=document.getElementById('nm').value.trim()||'الطالب';
-  document.getElementById('sbar').textContent='👤 '+nm;
+  document.getElementById('sbar').textContent='👤 '+(_uname||nm||'الطالب');
   c=0;sc=0;pk=false;log=[];
   go('s1');render();
 }
@@ -246,6 +256,20 @@ function showRes(){
   document.getElementById('rt').textContent=t;
   document.getElementById('rb').textContent=b;
   document.getElementById('rv').innerHTML=v;
+
+  var _dur=Math.round((Date.now()-(_startTime||Date.now()))/1000);
+  var _tot=T,_pct2=Math.round(sc/_tot*100);
+  var _m=Math.floor(_dur/60),_s2=_dur%60;
+  var _sm=document.getElementById('save-msg');
+  if(_sm){
+    if(!_uid){_sm.textContent='⚠️ لم تُحفظ — سجّل دخولك أولاً';_sm.style.cssText='display:block;background:#2a1e00;color:#f59e0b;padding:.5rem .8rem;border-radius:10px;text-align:center;font-size:.85rem;font-weight:700;margin:.5rem 0';}
+    else{_sm.style.cssText='display:block;background:#1e1e32;color:#94a3b8;padding:.5rem .8rem;border-radius:10px;text-align:center;font-size:.85rem;margin:.5rem 0';_sm.textContent='⏳ جارِ حفظ نتيجتك...';
+      _SB.from('results').insert([{user_id:_uid,subject:_subj,section_num:16,correct:sc,total:_tot,duration_sec:_dur,score_pct:_pct2}]).then(function(r){
+        if(!r.error){_sm.textContent='✅ نتيجتك '+sc+'/'+_tot+' ('+_pct2+'%) حُفظت في حسابك';_sm.style.background='#052e16';_sm.style.color='#22c55e';}
+        else{_sm.textContent='❌ خطأ في الحفظ';_sm.style.background='#2d0707';_sm.style.color='#ef4444';}
+      });
+    }
+  }
   go('s2');
   showRev('all');
 }

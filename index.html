@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
@@ -11,6 +12,8 @@
 :root{--bg:#0f0f1a;--s:#181828;--s2:#1e1e32;--bd:#2a2a48;--p:#7c3aed;--pl:#a855f7;--t:#06b6d4;--tx:#e2e8f0;--mt:#94a3b8;--gr:#22c55e;--g2:#052e16;--rd:#ef4444;--r2:#2d0707}
 html,body{background:var(--bg);font-family:'Tajawal',sans-serif;color:var(--tx);min-height:100vh}
 body{padding:1.5rem 1rem 5rem;max-width:920px;margin:auto}
+
+/* ── HEADER ── */
 .hdr{text-align:center;margin-bottom:1.8rem;padding-top:.5rem}
 .logo{font-size:2.5rem;margin-bottom:.4rem}
 h1{font-size:1.9rem;font-weight:800}
@@ -20,6 +23,8 @@ h1{font-size:1.9rem;font-weight:800}
 .stat{background:var(--s2);border:1px solid var(--bd);border-radius:12px;padding:.5rem 1.1rem;text-align:center}
 .stat .n{font-size:1.3rem;font-weight:800;color:var(--t)}
 .stat .l{font-size:.72rem;color:var(--mt)}
+
+/* ── USER BAR ── */
 .ubar{background:var(--s);border:1px solid var(--bd);border-radius:14px;padding:.75rem 1.1rem;margin-bottom:1.3rem;display:flex;align-items:center;justify-content:space-between;gap:1rem}
 .ubar-info{display:flex;align-items:center;gap:.7rem}
 .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--p),var(--t));display:flex;align-items:center;justify-content:center;font-size:.95rem;font-weight:800;color:#fff;flex-shrink:0}
@@ -29,19 +34,36 @@ h1{font-size:1.9rem;font-weight:800}
 .btn-sm:hover{border-color:var(--pl);color:var(--pl)}
 .btn-login{background:linear-gradient(135deg,var(--p),var(--t));color:#fff;border:none;border-radius:8px;padding:.45rem 1.1rem;font-family:inherit;font-size:.85rem;font-weight:700;cursor:pointer;transition:.13s}
 .btn-login:hover{opacity:.88}
+
+/* ── PROGRESS BAR ── */
 .prog-wrap{margin-bottom:1.3rem;display:none}
 .prog-hdr{display:flex;justify-content:space-between;font-size:.8rem;color:var(--mt);margin-bottom:.35rem}
 .prog-bar{height:7px;background:var(--s2);border-radius:99px;overflow:hidden}
 .prog-fill{height:100%;border-radius:99px;background:linear-gradient(90deg,var(--p),var(--t));transition:width .5s}
+.prog-secs{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.5rem}
+.psec{font-size:.73rem;padding:.2rem .55rem;border-radius:99px;font-weight:700}
+.psec.done{background:var(--g2);color:var(--gr)}
+.psec.pend{background:var(--s2);color:var(--mt)}
+
+/* ── SEARCH ── */
 .sw{position:relative;margin-bottom:1.4rem}
-.sw input{width:100%;background:var(--s);border:1.5px solid var(--bd);border-radius:12px;padding:.7rem 1rem .7rem 2.6rem;font-family:inherit;font-size:.94rem;color:var(--tx);outline:none;transition:border-color .15s}
+.sw input{width:100%;background:var(--s);border:1.5px solid var(--bd);border-radius:12px;
+padding:.7rem 1rem .7rem 2.6rem;font-family:inherit;font-size:.94rem;
+color:var(--tx);outline:none;transition:border-color .15s}
 .sw input:focus{border-color:var(--pl)}
 .sw input::placeholder{color:var(--mt)}
 .si{position:absolute;left:.9rem;top:50%;transform:translateY(-50%);color:var(--mt);pointer-events:none}
+
+/* ── GRID ── */
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:.8rem}
 @media(min-width:580px){.grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr))}}
-.card{background:var(--s);border:1.5px solid var(--bd);border-radius:16px;padding:1rem .95rem 2.2rem;text-decoration:none;display:block;position:relative;overflow:hidden;transition:border-color .18s,transform .15s,box-shadow .18s}
-.card::before{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(6,182,212,.05));opacity:0;transition:opacity .2s}
+
+/* ── SECTION CARD ── */
+.card{background:var(--s);border:1.5px solid var(--bd);border-radius:16px;
+padding:1rem .95rem 2.2rem;text-decoration:none;display:block;position:relative;
+overflow:hidden;transition:border-color .18s,transform .15s,box-shadow .18s}
+.card::before{content:'';position:absolute;inset:0;
+background:linear-gradient(135deg,rgba(124,58,237,.07),rgba(6,182,212,.05));opacity:0;transition:opacity .2s}
 .card:hover{border-color:var(--pl);transform:translateY(-3px);box-shadow:0 8px 28px rgba(124,58,237,.25)}
 .card:hover::before{opacity:1}
 .card.done{border-color:rgba(34,197,94,.35)}
@@ -53,9 +75,14 @@ h1{font-size:1.9rem;font-weight:800}
 .carrow{position:absolute;left:.9rem;bottom:.85rem;color:var(--bd);font-size:.88rem;transition:color .15s,transform .15s}
 .card:hover .carrow{color:var(--pl);transform:translateX(-3px)}
 .empty{text-align:center;color:var(--mt);padding:2rem;font-size:.95rem;display:none}
+
+/* ── SUBJ NAMES ── */
+.subj-names{kamy:'قدرات كمي',gat:'GAT',tahsili:'تحصيلي',saat:'SAAT'}
 </style>
 </head>
 <body>
+
+<!-- HEADER -->
 <div class="hdr">
   <div class="logo">🎓</div>
   <h1><span class="grad">منصة القصراوي</span></h1>
@@ -66,8 +93,10 @@ h1{font-size:1.9rem;font-weight:800}
     <div class="stat"><div class="n">١١</div><div class="l">سؤال في كل قسم</div></div>
   </div>
 </div>
+
+<!-- USER BAR -->
 <div class="ubar" id="ubar">
-  <div class="ubar-info">
+  <div class="ubar-info" id="ubar-info">
     <div class="av" id="uav">؟</div>
     <div>
       <div class="uname" id="uname-lbl">لم تسجّل الدخول بعد</div>
@@ -75,90 +104,149 @@ h1{font-size:1.9rem;font-weight:800}
     </div>
   </div>
   <div style="display:flex;gap:.5rem">
-    <button class="btn-login" id="btn-auth" onclick="goLogin()">🔐 دخول</button>
+    <button class="btn-login" id="btn-auth" onclick="goLogin()">🔐 دخول / تسجيل</button>
     <button class="btn-sm" id="btn-logout" style="display:none" onclick="doLogout()">خروج</button>
   </div>
 </div>
+
+<!-- PROGRESS (يظهر فقط للمستخدمين المسجّلين) -->
 <div class="prog-wrap" id="prog-wrap">
   <div class="prog-hdr">
     <span>📊 تقدّمك</span>
-    <span id="prog-txt">0 / 90 قسم</span>
+    <span id="prog-txt">0 / 0 قسم</span>
   </div>
   <div class="prog-bar"><div class="prog-fill" id="prog-fill" style="width:0%"></div></div>
 </div>
+
+<!-- SEARCH -->
 <div class="sw">
   <span class="si">🔍</span>
   <input type="text" id="search" placeholder="ابحث... مثلاً: 5 أو القسم 12" oninput="filterCards(this.value)" autocomplete="off">
 </div>
-<div class="grid" id="grid"></div>
-<div class="empty" id="empty">لا توجد نتائج 🔍</div>
-<script>
-const SB_URL='https://fnzzdracebdkcvtigris.supabase.co';
-const SB_KEY='sb_publishable_BPccEAh0KTTn4YMnNDL_JQ_GMlW3vr1';
-const _sb=supabase.createClient(SB_URL,SB_KEY);
-const SUBJ_NAMES={kamy:'📐 قدرات كمي',gat:'🎯 GAT',tahsili:'📚 تحصيلي',saat:'⚡ SAAT'};
 
-function getMe(){
-  const uid=localStorage.getItem('qk_uid');
-  const name=localStorage.getItem('qk_name');
-  const subj=localStorage.getItem('qk_subj')||'kamy';
-  return (uid&&name)?{uid,name,subj}:null;
+<!-- GRID -->
+<div class="grid" id="grid"></div>
+<div class="empty" id="empty">لا توجد نتائج للبحث 🔍</div>
+
+<script>
+// ══ CONFIG ══
+const SB_URL = 'https://fnzzdracebdkcvtigris.supabase.co';
+const SB_KEY = 'sb_publishable_BPccEAh0KTTn4YMnNDL_JQ_GMlW3vr1';
+const _sb = supabase.createClient(SB_URL, SB_KEY);
+
+const SUBJ_NAMES = {kamy:'📐 قدرات كمي', gat:'🎯 GAT', tahsili:'📚 تحصيلي', saat:'⚡ SAAT'};
+let doneSecs = new Set();
+
+// ══ AUTH STATE ══
+function getMe() {
+  try {
+    const uid  = localStorage.getItem('qk_uid');
+    const name = localStorage.getItem('qk_name');
+    const subj = localStorage.getItem('qk_subj') || 'kamy';
+    if (uid && name) return { uid, name, subj };
+  } catch(e) {}
+  return null;
 }
-function goLogin(){window.location.href='qudorat_platform.html';}
-function doLogout(){
-  ['qk_uid','qk_name','qk_subj'].forEach(k=>localStorage.removeItem(k));
+
+function goLogin() {
+  window.location.href = 'qudorat_platform.html';
+}
+
+function doLogout() {
+  localStorage.removeItem('qk_uid');
+  localStorage.removeItem('qk_name');
+  localStorage.removeItem('qk_subj');
   location.reload();
 }
 
-async function init(){
+// ══ INIT ══
+async function init() {
   buildGrid();
-  const me=getMe();
-  if(me){
-    document.getElementById('uav').textContent=me.name[0];
-    document.getElementById('uname-lbl').textContent=me.name;
-    document.getElementById('usubj-lbl').textContent=SUBJ_NAMES[me.subj]||me.subj;
-    document.getElementById('btn-auth').style.display='none';
-    document.getElementById('btn-logout').style.display='';
-    await loadProgress(me.uid,me.subj);
+  const me = getMe();
+
+  if (me) {
+    // عرض معلومات المستخدم
+    document.getElementById('uav').textContent = me.name[0];
+    document.getElementById('uname-lbl').textContent = me.name;
+    document.getElementById('usubj-lbl').textContent = SUBJ_NAMES[me.subj] || me.subj;
+    document.getElementById('btn-auth').style.display = 'none';
+    document.getElementById('btn-logout').style.display = '';
+
+    // تحميل الأقسام المنجزة
+    await loadProgress(me.uid, me.subj);
   }
 }
 
-async function loadProgress(uid,subj){
-  try{
-    const{data}=await _sb.from('results').select('section_num,score_pct').eq('user_id',uid).eq('subject',subj);
-    if(!data||!data.length)return;
-    const best={};
-    data.forEach(r=>{if(!best[r.section_num]||r.score_pct>best[r.section_num])best[r.section_num]=r.score_pct;});
-    document.querySelectorAll('.card').forEach(c=>{
-      const n=parseInt(c.dataset.n);
-      if(best[n]!==undefined){c.classList.add('done');c.querySelector('.cscore').textContent=`✅ ${best[n]}%`;}
+async function loadProgress(uid, subj) {
+  try {
+    const { data } = await _sb.from('results')
+      .select('section_num, score_pct')
+      .eq('user_id', uid)
+      .eq('subject', subj);
+
+    if (!data || !data.length) return;
+
+    // أحدث نتيجة لكل قسم
+    const best = {};
+    data.forEach(r => {
+      if (!best[r.section_num] || r.score_pct > best[r.section_num])
+        best[r.section_num] = r.score_pct;
     });
-    const done=Object.keys(best).length;
-    document.getElementById('prog-wrap').style.display='block';
-    document.getElementById('prog-txt').textContent=`${done} / 90 قسم`;
-    document.getElementById('prog-fill').style.width=(done/90*100)+'%';
-  }catch(e){console.error(e);}
+
+    doneSecs = new Set(Object.keys(best).map(Number));
+
+    // تحديث البطاقات
+    document.querySelectorAll('.card').forEach(c => {
+      const n = parseInt(c.dataset.n);
+      if (best[n] !== undefined) {
+        c.classList.add('done');
+        const s = c.querySelector('.cscore');
+        if (s) s.textContent = `✅ ${best[n]}%`;
+      }
+    });
+
+    // شريط التقدم
+    const total = document.querySelectorAll('.card').length;
+    const done  = doneSecs.size;
+    document.getElementById('prog-wrap').style.display = 'block';
+    document.getElementById('prog-txt').textContent = `${done} / ${total} قسم`;
+    document.getElementById('prog-fill').style.width = (done / total * 100) + '%';
+
+  } catch(e) { console.error(e); }
 }
 
-function buildGrid(){
-  const grid=document.getElementById('grid');
-  for(let i=1;i<=90;i++){
-    const a=document.createElement('a');
-    a.className='card';a.href=`sec_${String(i).padStart(2,'0')}.html`;a.dataset.n=i;
-    a.innerHTML=`<div class="cnum">القسم ${i}</div><div class="ctitle">أقسام الكمي</div><div class="cqs">١١ سؤالاً</div><div class="cscore"></div><span class="carrow">←</span>`;
+// ══ GRID ══
+function buildGrid() {
+  const grid = document.getElementById('grid');
+  for (let i = 1; i <= 90; i++) {
+    const a = document.createElement('a');
+    a.className = 'card';
+    a.href = `sec_${String(i).padStart(2,'0')}.html`;
+    a.dataset.n = i;
+    a.innerHTML =
+      `<div class="cnum">القسم ${i}</div>` +
+      `<div class="ctitle">أقسام الكمي</div>` +
+      `<div class="cqs">١١ سؤالاً</div>` +
+      `<div class="cscore"></div>` +
+      `<span class="carrow">←</span>`;
     grid.appendChild(a);
   }
 }
 
-function filterCards(q){
-  q=q.trim();let shown=0;
-  document.querySelectorAll('.card').forEach(c=>{
-    const n=c.dataset.n;
-    const match=!q||n===q||n.includes(q)||('القسم '+n).includes(q)||q.includes(n);
-    c.style.display=match?'':'none';if(match)shown++;
+function filterCards(q) {
+  q = q.trim();
+  const cards = document.querySelectorAll('.card');
+  let shown = 0;
+  cards.forEach(c => {
+    const n = c.dataset.n;
+    const match = !q || n === q || n.includes(q) ||
+      ('القسم ' + n).includes(q) || q.includes(n);
+    c.style.display = match ? '' : 'none';
+    if (match) shown++;
   });
-  document.getElementById('empty').style.display=shown===0?'block':'none';
+  document.getElementById('empty').style.display = shown === 0 ? 'block' : 'none';
 }
+
 init();
 </script>
 </body>

@@ -105,7 +105,7 @@ window.addEventListener('DOMContentLoaded',function(){
   <div class="sr"><div class="sb sc2"><div class="n" id="rc">0</div><div class="l">صحيح</div></div><div class="sb sw"><div class="n" id="rw">0</div><div class="l">خاطئ</div></div><div class="sb st"><div class="n" id="rtl">0</div><div class="l">المجموع</div></div></div>
   <p class="vd" id="rv"></p><div id="sm" class="save-msg"></div>
   <button class="btn bp" onclick="rst()">🔄 إعادة الاختبار</button>
-  <button class="btn bg" onclick="dlPDF()" id="pdf-btn" style="margin-top:.6rem;background:linear-gradient(135deg,#059669,#0891b2);color:#fff;border:none">📄 تحميل PDF المحلول</button>
+  <button class="btn" id="pdf-btn" onclick="dlPDF()" style="background:linear-gradient(135deg,#059669,#0891b2);color:#fff;border:none;margin-top:.6rem">📄 تحميل PDF المحلول</button>
   <a class="btn bg" style="display:block;text-align:center;margin-top:.6rem" href="sec_92.html">القسم التالي ←</a>
   <button class="btn bg" onclick="location.href='index.html'">🏠 الرئيسية</button>
   <div class="rev-title">🔍 مراجعة الأسئلة</div>
@@ -145,108 +145,19 @@ function showRes(){
   if(_uid){
     sm.style.cssText='display:block;background:#1e1e32;color:#94a3b8;padding:.5rem .8rem;border-radius:10px;text-align:center;font-size:.85rem;margin:.5rem 0';
     sm.textContent='⏳ جارٍ حفظ نتيجتك...';
-    // حفظ النتيجة الإجمالية
     _SB.from('results').insert([{user_id:_uid,subject:_subj,section_num:91,correct:sc,total:T,duration_sec:dur,score_pct:pct}]).then(r=>{
-      if(!r.error){
-        sm.textContent='✅ نتيجتك '+sc+'/'+T+' ('+pct+'%) حُفظت في حسابك';
-        sm.style.background='#052e16';sm.style.color='#22c55e';
-      }else{sm.textContent='❌ خطأ في الحفظ';sm.style.background='#2d0707';sm.style.color='#ef4444';}
+      if(!r.error){sm.textContent='✅ نتيجتك '+sc+'/'+T+' ('+pct+'%) حُفظت في حسابك';sm.style.background='#052e16';sm.style.color='#22c55e';}
+      else{sm.textContent='❌ خطأ في الحفظ';sm.style.background='#2d0707';sm.style.color='#ef4444';}
     });
-    // حفظ تفاصيل كل سؤال
-    const details=log.map(e=>({
+    _SB.from('result_details').insert(log.map(e=>({
       user_id:_uid,subject:_subj,section_num:91,
-      question_index:e.q,is_correct:e.ok,
-      chosen:e.ch,correct_answer:QS[e.q].ans
-    }));
-    _SB.from('result_details').insert(details);
+      question_index:e.q,is_correct:e.ok,chosen:e.ch,correct_answer:QS[e.q].ans
+    })));
   }else{
     sm.textContent='⚠️ لم تُحفظ — سجّل دخولك أولاً';
     sm.style.cssText='display:block;background:#2a1e00;color:#f59e0b;padding:.5rem .8rem;border-radius:10px;text-align:center;font-size:.85rem;font-weight:700;margin:.5rem 0';
   }
   go('s2');rev('all');
-}
-
-// ── توليد PDF المحلول ──
-async function dlPDF(){
-  const btn=document.getElementById('pdf-btn');
-  btn.textContent='⏳ جارٍ التوليد...';btn.disabled=true;
-  const {jsPDF}=window.jspdf;
-  const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
-  const W=210,margin=15,lineH=8;
-  let y=margin;
-
-  // دالة إضافة نص عربي
-  function addText(text,x,yPos,size,align){
-    pdf.setFontSize(size||12);
-    pdf.text(text,x,yPos,{align:align||'right'});
-  }
-
-  // رأس الصفحة
-  pdf.setFillColor(15,15,26);pdf.rect(0,0,W,20,'F');
-  pdf.setTextColor(255,255,255);
-  addText('القسم 91 — قدرات كمي',W-margin,13,14,'right');
-  addText('الطالب: '+(_uname||'—'),margin+60,13,11,'left');
-  pdf.setTextColor(0,0,0);
-  y=28;
-
-  for(let i=0;i<log.length;i++){
-    const e=log[i];const q=QS[e.q];
-    if(y>260){pdf.addPage();y=margin;}
-
-    // رقم السؤال + نتيجة
-    const clr=e.ok?[5,46,22]:[45,7,7];
-    pdf.setFillColor(...clr);
-    pdf.roundedRect(margin,y,W-2*margin,7,2,2,'F');
-    pdf.setTextColor(e.ok?34:239,e.ok?197:68,e.ok?94:68);
-    addText((e.ok?'✓ صحيح':'✗ خاطئ')+' — السؤال '+(e.q+1),W-margin-2,y+5,10,'right');
-    pdf.setTextColor(150,150,180);
-    addText('الإجابة الصحيحة: '+L[q.ans],margin+2,y+5,9,'left');
-    if(!e.ok){addText('اخترت: '+L[e.ch],margin+50,y+5,9,'left');}
-    pdf.setTextColor(0,0,0);
-    y+=10;
-
-    // صورة السؤال
-    if(q.img){
-      try{
-        const img=new Image();
-        await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=q.img;});
-        const maxW=W-2*margin,maxH=55;
-        let iW=img.naturalWidth,iH=img.naturalHeight;
-        let ratio=Math.min(maxW/iW,maxH/iH);
-        const dW=iW*ratio,dH=iH*ratio;
-        const xOff=(W-dW)/2;
-        if(y+dH>270){pdf.addPage();y=margin;}
-        pdf.setFillColor(255,255,255);pdf.rect(xOff-2,y-1,dW+4,dH+2,'F');
-        pdf.addImage(q.img,'JPEG',xOff,y,dW,dH);
-        y+=dH+4;
-      }catch(err){y+=3;}
-    }
-
-    // نص السؤال
-    if(q.text){
-      pdf.setFontSize(10);pdf.setTextColor(30,30,50);
-      const lines=pdf.splitTextToSize(q.text,W-2*margin);
-      lines.forEach(ln=>{
-        if(y>270){pdf.addPage();y=margin;}
-        pdf.text(ln,W-margin,y,{align:'right'});y+=lineH-2;
-      });
-      y+=2;
-    }
-
-    // خط فاصل
-    if(y<265){pdf.setDrawColor(42,42,72);pdf.setLineWidth(0.3);pdf.line(margin,y,W-margin,y);y+=5;}
-  }
-
-  // تذييل
-  const pages=pdf.internal.getNumberOfPages();
-  for(let p=1;p<=pages;p++){
-    pdf.setPage(p);pdf.setFontSize(8);pdf.setTextColor(100,100,120);
-    pdf.text('صفحة '+p+' من '+pages,W/2,290,{align:'center'});
-    pdf.text('منصة القصراوي',margin,290);
-  }
-
-  pdf.save('القسم_91_محلول.pdf');
-  btn.textContent='📄 تحميل PDF المحلول';btn.disabled=false;
 }
 function rev(f){
   ['all','ok','no'].forEach(x=>document.getElementById('t'+x).className='rtab'+(f===x?' act-'+x:''));
@@ -263,6 +174,76 @@ function rev(f){
     q.opts.forEach((o,i)=>{const s=document.createElement('span');s.className='rans'+(i===q.ans?' ok':i===e.ch&&!e.ok?' no':'');s.textContent=L[i]+' '+o;od.appendChild(s);});
     body.appendChild(od);card.appendChild(body);rl.appendChild(card);
   });
+}
+
+async function dlPDF(){
+  const btn=document.getElementById('pdf-btn');
+  if(btn){btn.textContent='⏳ جارٍ التوليد...';btn.disabled=true;}
+  try{
+    const {jsPDF}=window.jspdf;
+    const pdf=new jsPDF({orientation:'p',unit:'mm',format:'a4'});
+    const W=210,M=15;
+    let y=M;
+
+    // رأس
+    pdf.setFillColor(15,15,26);pdf.rect(0,0,W,22,'F');
+    pdf.setTextColor(255,255,255);pdf.setFontSize(13);
+    pdf.text('القسم 91 — قدرات كمي',W-M,13,{align:'right'});
+    pdf.setFontSize(10);
+    pdf.text('الطالب: '+(_uname||'—'),M,13,{align:'left'});
+    pdf.setTextColor(0,0,0);
+    y=30;
+
+    for(let i=0;i<log.length;i++){
+      const e=log[i];const q=QS[e.q];
+      if(y>265){pdf.addPage();y=M;}
+
+      // شريط الحالة
+      const ok=e.ok;
+      pdf.setFillColor(ok?5:45,ok?46:7,ok?22:7);
+      pdf.roundedRect(M,y,W-2*M,8,2,2,'F');
+      pdf.setFontSize(10);
+      pdf.setTextColor(ok?34:239,ok?197:68,ok?94:68);
+      pdf.text((ok?'✓ صحيح':'✗ خاطئ')+' — السؤال '+(e.q+1),W-M-2,y+5.5,{align:'right'});
+      pdf.setFontSize(9);pdf.setTextColor(180,180,200);
+      pdf.text('الإجابة: '+L[q.ans]+(!ok?' | اخترت: '+L[e.ch]:''),M+2,y+5.5,{align:'left'});
+      pdf.setTextColor(0,0,0);
+      y+=11;
+
+      // صورة السؤال
+      if(q.img){
+        try{
+          const im=new Image();
+          await new Promise((res,rej)=>{im.onload=res;im.onerror=rej;im.src=q.img;});
+          const mW=W-2*M,mH=60;
+          const rat=Math.min(mW/im.naturalWidth,mH/im.naturalHeight);
+          const dW=im.naturalWidth*rat,dH=im.naturalHeight*rat;
+          if(y+dH>270){pdf.addPage();y=M;}
+          pdf.setFillColor(255,255,255);pdf.rect((W-dW)/2-2,y-1,dW+4,dH+2,'F');
+          pdf.addImage(q.img,'JPEG',(W-dW)/2,y,dW,dH);
+          y+=dH+4;
+        }catch(er){y+=2;}
+      }
+
+      // نص السؤال
+      if(q.text){
+        pdf.setFontSize(10);pdf.setTextColor(30,30,50);
+        const ls=pdf.splitTextToSize(q.text,W-2*M);
+        ls.forEach(l=>{if(y>270){pdf.addPage();y=M;}pdf.text(l,W-M,y,{align:'right'});y+=7;});
+        y+=2;
+      }
+
+      // فاصل
+      if(y<262){pdf.setDrawColor(42,42,72);pdf.setLineWidth(0.3);pdf.line(M,y,W-M,y);y+=5;}
+    }
+
+    // تذييل
+    const pg=pdf.internal.getNumberOfPages();
+    for(let p=1;p<=pg;p++){pdf.setPage(p);pdf.setFontSize(8);pdf.setTextColor(100,100,120);pdf.text('صفحة '+p+' من '+pg,W/2,290,{align:'center'});pdf.text('منصة القصراوي',M,290);}
+
+    pdf.save('القسم_91_محلول.pdf');
+  }catch(er){alert('خطأ في توليد PDF: '+er.message);}
+  if(btn){btn.textContent='📄 تحميل PDF المحلول';btn.disabled=false;}
 }
 function rst(){c=0;sc=0;pk=false;log=[];go('s0');}
 </script>

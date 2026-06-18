@@ -51,6 +51,19 @@ tr:hover td{background:var(--s2)}
 .subj-name{font-size:.95rem;font-weight:800}
 .chip{display:flex;align-items:center;gap:.4rem;background:var(--s2);border:1px solid var(--bd);border-radius:99px;padding:.28rem .8rem .28rem .45rem;font-size:.82rem;font-weight:700}
 @media(max-width:540px){.metrics{grid-template-columns:1fr 1fr}.subj-grid{grid-template-columns:1fr 1fr}}
+
+.qdet-modal{display:none;position:fixed;inset:0;background:#000a;z-index:999;align-items:center;justify-content:center;padding:1rem}
+.qdet-modal.open{display:flex}
+.qdet-box{background:var(--s);border:1px solid var(--bd);border-radius:18px;max-width:640px;width:100%;max-height:85vh;overflow-y:auto;padding:1.4rem}
+.qdet-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:1rem}
+.qdet-close{background:var(--r2);color:var(--rd);border:1px solid var(--rd);border-radius:8px;padding:.3rem .8rem;cursor:pointer;font-family:inherit;font-size:.85rem}
+.qdet-item{display:flex;align-items:center;gap:.7rem;padding:.6rem .8rem;border-radius:10px;margin-bottom:.5rem}
+.qdet-item.ok{background:var(--g2);border:1px solid rgba(34,197,94,.3)}
+.qdet-item.no{background:var(--r2);border:1px solid rgba(239,68,68,.3)}
+.qdet-num{font-size:.85rem;font-weight:800;color:var(--mt);min-width:55px}
+.qdet-icon{font-size:1.2rem;flex-shrink:0}
+.qdet-info{flex:1;font-size:.85rem}
+.qdet-ans{font-size:.8rem;color:var(--mt)}
 </style>
 </head>
 <body>
@@ -433,13 +446,14 @@ function showDet(uid,name){
     <div class="metric"><div class="mn">${fmtD(avgD)}</div><div class="ml">متوسط الوقت</div></div>
     <div class="metric"><div class="mn">${fmtD(totalSec)}</div><div class="ml">إجمالي الوقت</div></div>`;
   document.getElementById('det-tbl').innerHTML=rs.length?`<table>
-    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
+    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th><th>تفاصيل</th></tr></thead>
     <tbody>${rs.map(r=>`<tr>
       <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
       <td>${r.section_num}</td><td>${bdg(r.score_pct)}</td>
       <td><span style="color:var(--gr)">✅${r.correct}</span>/<span style="color:var(--rd)">❌${r.total-r.correct}</span></td>
       <td>${fmtD(r.duration_sec)}</td>
       <td style="font-size:.77rem;color:var(--mt)">${fmtDate(r.created_at)}</td>
+      <td><button onclick="showQDet('${uid}',${r.section_num},'${name}')" style="background:#1a1030;color:var(--pl);border:1px solid var(--p);border-radius:7px;padding:.25rem .6rem;font-size:.75rem;cursor:pointer;font-family:inherit">🔍 الأسئلة</button></td>
     </tr>`).join('')}</tbody>
   </table>`:'<div style="text-align:center;padding:1rem;color:var(--mt)">لا توجد اختبارات</div>';
   showPg('pg-det');
@@ -475,7 +489,7 @@ async function refreshStudent(){
     <div class="metric"><div class="mn">${myResults.filter(r=>isToday(r.created_at)).length}</div><div class="ml">اختبارات اليوم</div></div>`;
 
   document.getElementById('stu-tbl').innerHTML=myResults.length?`<table>
-    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th></tr></thead>
+    <thead><tr><th>المادة</th><th>القسم</th><th>الدرجة</th><th>صح/خطأ</th><th>الوقت</th><th>التاريخ</th><th>تفاصيل</th></tr></thead>
     <tbody>${myResults.map(r=>`<tr>
       <td>${SUBJ[r.subject]?.ic||''} ${SUBJ[r.subject]?.n||r.subject}</td>
       <td>${r.section_num}</td><td>${bdg(r.score_pct)}</td>
@@ -516,6 +530,56 @@ function bdg(p){return p>=80?`<span class="bdg b-gr">${p}%</span>`:p>=50?`<span 
 function fmtD(s){if(!s&&s!==0)return '—';const m=Math.floor(s/60);const sec=s%60;return m>0?`${m}د ${sec}ث`:`${sec}ث`;}
 function fmtDate(ts){if(!ts)return '—';return new Date(ts).toLocaleDateString('ar-SA',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});}
 function isToday(ts){const d=new Date(ts),n=new Date();return d.toDateString()===n.toDateString();}
+
+function showQDet(uid, secNum, name){
+  const L=['أ','ب','ج','د'];
+  const det=(window._details||[]).filter(d=>d.user_id===uid && d.section_num===secNum);
+  
+  document.getElementById('qdet-title').textContent='تفاصيل أسئلة القسم '+secNum+' — '+name;
+  
+  const correct=det.filter(d=>d.is_correct).length;
+  const total=det.length;
+  document.getElementById('qdet-sub').textContent=total+' سؤال | '+correct+' صحيح | '+(total-correct)+' خاطئ';
+  
+  const list=document.getElementById('qdet-list');
+  if(!det.length){
+    list.innerHTML='<div style="text-align:center;padding:2rem;color:var(--mt)">لا توجد تفاصيل محفوظة لهذا القسم</div>';
+  } else {
+    const sorted=det.slice().sort((a,b)=>a.question_index-b.question_index);
+    list.innerHTML=sorted.map(d=>`
+      <div class="qdet-item ${d.is_correct?'ok':'no'}">
+        <div class="qdet-num">السؤال ${d.question_index+1}</div>
+        <div class="qdet-icon">${d.is_correct?'✅':'❌'}</div>
+        <div class="qdet-info">
+          <div>${d.is_correct?'أجاب صحيحاً':'أجاب خطأً'}</div>
+          <div class="qdet-ans">
+            الإجابة الصحيحة: <strong style="color:var(--gr)">${L[d.correct_answer]||'—'}</strong>
+            ${!d.is_correct?` | اختار: <strong style="color:var(--rd)">${L[d.chosen]||'—'}</strong>`:''}
+          </div>
+        </div>
+      </div>`).join('');
+  }
+  
+  document.getElementById('qdet-modal').classList.add('open');
+}
+
+function closeQDet(){
+  document.getElementById('qdet-modal').classList.remove('open');
+}
+
 </script>
+
+<div class="qdet-modal" id="qdet-modal" onclick="if(event.target===this)closeQDet()">
+  <div class="qdet-box">
+    <div class="qdet-hdr">
+      <div>
+        <div style="font-size:1rem;font-weight:800" id="qdet-title">تفاصيل الأسئلة</div>
+        <div style="font-size:.78rem;color:var(--mt)" id="qdet-sub"></div>
+      </div>
+      <button class="qdet-close" onclick="closeQDet()">✕ إغلاق</button>
+    </div>
+    <div id="qdet-list"></div>
+  </div>
+</div>
 </body>
 </html>
